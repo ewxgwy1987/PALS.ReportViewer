@@ -290,6 +290,17 @@ Public Class ReportViewer
 
     Private Sub ReportViewer_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Me.TopMost = True
+
+        'Add by Guo Wenyu 2014/04/08 for display winform in Extended Monitor
+        Dim screen_width As Integer
+        Dim screen_heigh As Integer
+        Dim pos_x As Integer
+        Dim pos_y As Integer
+        screen_width = Screen.PrimaryScreen.Bounds.Width
+        screen_heigh = Screen.PrimaryScreen.Bounds.Height
+        pos_y = CInt(screen_heigh / 2 - Me.ClientSize.Height / 2)
+        pos_x = CInt(screen_width / 4 - Me.ClientSize.Width / 2)
+        Me.Location = New Point(pos_x, pos_y)
     End Sub
 
     Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click

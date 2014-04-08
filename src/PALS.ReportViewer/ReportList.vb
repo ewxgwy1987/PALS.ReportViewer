@@ -118,6 +118,8 @@ Public Class ReportList
                 End If
             End If
 
+            'Add by Guo Wenyu 2014/04/08
+            'Access report server to get all report names and paths
             m_ReportsByUser = GetReportsByCurrentUser()
 
             Select Case m_GlobalInfo.ReportListStyle
@@ -134,9 +136,17 @@ Public Class ReportList
                     FillInTreeView()
             End Select
 
-            'Add by Guo Wenyu 2014/04/08
-            'Access report server to get all report names and paths
-
+           
+            'Add by Guo Wenyu 2014/01/11 for display winform in Extended Monitor
+            Dim screen_width As Integer
+            Dim screen_heigh As Integer
+            Dim pos_x As Integer
+            Dim pos_y As Integer
+            screen_width = Screen.PrimaryScreen.Bounds.Width
+            screen_heigh = Screen.PrimaryScreen.Bounds.Height
+            pos_y = CInt(screen_heigh / 2 - Me.ClientSize.Height / 2)
+            pos_x = CInt(screen_width / 4 - Me.ClientSize.Width / 2)
+            Me.Location = New Point(pos_x, pos_y)
 
         Catch ex As Exception
             If m_Logger.IsErrorEnabled Then

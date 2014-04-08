@@ -22,22 +22,22 @@ Partial Class ReportList
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ReportList))
-        Me.gbType = New System.Windows.Forms.GroupBox
-        Me.rbType6 = New System.Windows.Forms.RadioButton
-        Me.rbType5 = New System.Windows.Forms.RadioButton
-        Me.rbType1 = New System.Windows.Forms.RadioButton
-        Me.rbType2 = New System.Windows.Forms.RadioButton
-        Me.rbType4 = New System.Windows.Forms.RadioButton
-        Me.rbType3 = New System.Windows.Forms.RadioButton
-        Me.btnPreview = New System.Windows.Forms.Button
-        Me.btnClose = New System.Windows.Forms.Button
-        Me.lbReports = New System.Windows.Forms.ListBox
-        Me.tvReports = New System.Windows.Forms.TreeView
+        Me.gbType = New System.Windows.Forms.GroupBox()
+        Me.rbType6 = New System.Windows.Forms.RadioButton()
+        Me.rbType5 = New System.Windows.Forms.RadioButton()
+        Me.rbType1 = New System.Windows.Forms.RadioButton()
+        Me.rbType2 = New System.Windows.Forms.RadioButton()
+        Me.rbType4 = New System.Windows.Forms.RadioButton()
+        Me.rbType3 = New System.Windows.Forms.RadioButton()
+        Me.btnPreview = New System.Windows.Forms.Button()
+        Me.btnClose = New System.Windows.Forms.Button()
+        Me.lbReports = New System.Windows.Forms.ListBox()
+        Me.tvReports = New System.Windows.Forms.TreeView()
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.ApplicationInfoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.ApplicationInfoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.gbType.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -55,7 +55,7 @@ Partial Class ReportList
         Me.gbType.ForeColor = System.Drawing.SystemColors.ActiveCaption
         Me.gbType.Location = New System.Drawing.Point(372, 6)
         Me.gbType.Name = "gbType"
-        Me.gbType.Size = New System.Drawing.Size(110, 144)
+        Me.gbType.Size = New System.Drawing.Size(110, 133)
         Me.gbType.TabIndex = 1
         Me.gbType.TabStop = False
         Me.gbType.Text = "Type"
@@ -65,7 +65,7 @@ Partial Class ReportList
         Me.rbType6.AutoSize = True
         Me.rbType6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType6.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType6.Location = New System.Drawing.Point(10, 116)
+        Me.rbType6.Location = New System.Drawing.Point(10, 107)
         Me.rbType6.Name = "rbType6"
         Me.rbType6.Size = New System.Drawing.Size(55, 17)
         Me.rbType6.TabIndex = 1
@@ -79,7 +79,7 @@ Partial Class ReportList
         Me.rbType5.AutoSize = True
         Me.rbType5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType5.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType5.Location = New System.Drawing.Point(10, 97)
+        Me.rbType5.Location = New System.Drawing.Point(10, 90)
         Me.rbType5.Name = "rbType5"
         Me.rbType5.Size = New System.Drawing.Size(55, 17)
         Me.rbType5.TabIndex = 0
@@ -93,7 +93,7 @@ Partial Class ReportList
         Me.rbType1.AutoSize = True
         Me.rbType1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType1.Location = New System.Drawing.Point(10, 21)
+        Me.rbType1.Location = New System.Drawing.Point(10, 19)
         Me.rbType1.Name = "rbType1"
         Me.rbType1.Size = New System.Drawing.Size(70, 17)
         Me.rbType1.TabIndex = 0
@@ -107,7 +107,7 @@ Partial Class ReportList
         Me.rbType2.AutoSize = True
         Me.rbType2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType2.Location = New System.Drawing.Point(10, 40)
+        Me.rbType2.Location = New System.Drawing.Point(10, 37)
         Me.rbType2.Name = "rbType2"
         Me.rbType2.Size = New System.Drawing.Size(78, 17)
         Me.rbType2.TabIndex = 0
@@ -121,7 +121,7 @@ Partial Class ReportList
         Me.rbType4.AutoSize = True
         Me.rbType4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType4.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType4.Location = New System.Drawing.Point(10, 78)
+        Me.rbType4.Location = New System.Drawing.Point(10, 72)
         Me.rbType4.Name = "rbType4"
         Me.rbType4.Size = New System.Drawing.Size(55, 17)
         Me.rbType4.TabIndex = 0
@@ -135,7 +135,7 @@ Partial Class ReportList
         Me.rbType3.AutoSize = True
         Me.rbType3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType3.Location = New System.Drawing.Point(10, 59)
+        Me.rbType3.Location = New System.Drawing.Point(10, 54)
         Me.rbType3.Name = "rbType3"
         Me.rbType3.Size = New System.Drawing.Size(55, 17)
         Me.rbType3.TabIndex = 0
@@ -147,9 +147,9 @@ Partial Class ReportList
         'btnPreview
         '
         Me.btnPreview.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreview.Location = New System.Drawing.Point(407, 224)
+        Me.btnPreview.Location = New System.Drawing.Point(407, 207)
         Me.btnPreview.Name = "btnPreview"
-        Me.btnPreview.Size = New System.Drawing.Size(75, 23)
+        Me.btnPreview.Size = New System.Drawing.Size(75, 21)
         Me.btnPreview.TabIndex = 3
         Me.btnPreview.Text = "Preview"
         Me.btnPreview.UseVisualStyleBackColor = True
@@ -158,9 +158,9 @@ Partial Class ReportList
         '
         Me.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(407, 253)
+        Me.btnClose.Location = New System.Drawing.Point(407, 234)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(75, 23)
+        Me.btnClose.Size = New System.Drawing.Size(75, 21)
         Me.btnClose.TabIndex = 4
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
@@ -169,9 +169,9 @@ Partial Class ReportList
         '
         Me.lbReports.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lbReports.FormattingEnabled = True
-        Me.lbReports.Location = New System.Drawing.Point(10, 12)
+        Me.lbReports.Location = New System.Drawing.Point(10, 11)
         Me.lbReports.Name = "lbReports"
-        Me.lbReports.Size = New System.Drawing.Size(348, 264)
+        Me.lbReports.Size = New System.Drawing.Size(348, 238)
         Me.lbReports.TabIndex = 5
         '
         'tvReports
@@ -180,11 +180,11 @@ Partial Class ReportList
         Me.tvReports.HideSelection = False
         Me.tvReports.ImageIndex = 0
         Me.tvReports.ImageList = Me.ImageList1
-        Me.tvReports.Location = New System.Drawing.Point(10, 12)
+        Me.tvReports.Location = New System.Drawing.Point(10, 11)
         Me.tvReports.Name = "tvReports"
         Me.tvReports.SelectedImageIndex = 2
         Me.tvReports.ShowNodeToolTips = True
-        Me.tvReports.Size = New System.Drawing.Size(348, 264)
+        Me.tvReports.Size = New System.Drawing.Size(348, 255)
         Me.tvReports.TabIndex = 6
         '
         'ImageList1
@@ -200,21 +200,21 @@ Partial Class ReportList
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ApplicationInfoToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(162, 26)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(178, 26)
         '
         'ApplicationInfoToolStripMenuItem
         '
         Me.ApplicationInfoToolStripMenuItem.Name = "ApplicationInfoToolStripMenuItem"
-        Me.ApplicationInfoToolStripMenuItem.Size = New System.Drawing.Size(161, 22)
+        Me.ApplicationInfoToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.ApplicationInfoToolStripMenuItem.Text = "Application Info..."
         '
         'ReportList
         '
         Me.AcceptButton = Me.btnPreview
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnClose
-        Me.ClientSize = New System.Drawing.Size(494, 288)
+        Me.ClientSize = New System.Drawing.Size(494, 278)
         Me.ContextMenuStrip = Me.ContextMenuStrip1
         Me.Controls.Add(Me.tvReports)
         Me.Controls.Add(Me.gbType)
