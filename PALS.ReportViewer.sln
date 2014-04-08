@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{510C318C-0160-4BA6-8616-F310C826290E}"
+	ProjectSection(SolutionItems) = preProject
+		ReleaseHistory.txt = ReleaseHistory.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cfg", "cfg", "{01D9B1B8-C75E-4AC8-8353-9A76E604D789}"
+	ProjectSection(SolutionItems) = preProject
+		cfg\CFG_Reporting.xml = cfg\CFG_Reporting.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E10846AD-80F8-4B35-B718-D776B505C3E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{E1C03579-2CD6-42EE-BA11-371B44B6AE4D}"
+	ProjectSection(SolutionItems) = preProject
+		doc\PALS ReportViewer Designs.doc = doc\PALS ReportViewer Designs.doc
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "PALS.ReportViewer", "src\PALS.ReportViewer\PALS.ReportViewer.vbproj", "{2CC51CA1-79E3-4647-9084-EA5890F3AFA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2CC51CA1-79E3-4647-9084-EA5890F3AFA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CC51CA1-79E3-4647-9084-EA5890F3AFA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CC51CA1-79E3-4647-9084-EA5890F3AFA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CC51CA1-79E3-4647-9084-EA5890F3AFA4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2CC51CA1-79E3-4647-9084-EA5890F3AFA4} = {E10846AD-80F8-4B35-B718-D776B505C3E6}
+	EndGlobalSection
+EndGlobal
