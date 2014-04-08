@@ -21,18 +21,20 @@
 		<!-- Setup the root category, add the appenders and set the default level -->
     		<root>
 			<!-- Level value can be ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF -->
-			<level value="OFF" />
+			<level value="ALL" />
 			<appender-ref ref="RollingLogFileAppender" />
 		</root>
 	</log4net>
 
   <configSet name="Reporting">
+    <DBConnectionString>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer;Data Source=EWXGWY1987-PC\MSSQLSERVERGWY;Packet Size=4096; Connection Timeout=80</DBConnectionString>
+    <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
     <!--
     Global Report Server URL. Individual report can has own reportServerUrl node, so that your
     can print the reports that are located in the different report servers. If the individual report 
     don't have reportServerUrl node, this global report server URL will be used. 
     -->
-    <reportServerUrl>http://localhost:8080/ReportServer</reportServerUrl>
+    <reportServerUrl>http://localhost/ReportServer</reportServerUrl>
     <!--
     User identity of log onto reporting server. If userName is empty, then Windows authentication 
     of current logged in user on client computer will be used for logging onto reporting server. Otherwise,
@@ -45,7 +47,7 @@
     2. Actual user name, password and domain should be assigned for SQL Server 2008 Reporting Service;
     3. DO NOT ASSIGN ADMINISTRATOR USER NAME AND PASSWORD IN THIS FILE.
     -->
-    <reportServerCredential userName="reportuser" password="BHSRep0rtUser" domain="csi" />
+    <!--<reportServerCredential userName="reportuser" password="BHSRep0rtUser" domain="csi" />-->
     <!--
     previewZoom attribute mode: 0 - FullPage, 1 - PageWidth, 2 - Percent;
     attribute percent: integer value of zoom percentage. Percentage will only be used when mode attribute is Percent 
@@ -143,14 +145,9 @@
 
     <!-- Report Group and Individual Report Defination: -->
     <reports group="SAC">
-
-      <report enabled="True" type="" name="Airline Report">
-        <authentication>True</authentication>
-        <reportPath>/BHSReports/Airline</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-      </report>
-
+      <!--
       <report enabled="True" type="" name="ATR Statistics Report">
+		<authentication>True</authentication>
         <reportPath>/BHSReports/ATRStatistics</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
@@ -158,397 +155,252 @@
           <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
+	  -->
 
-      <report enabled="True" type="" name="ATR Utilization Report">
-        <reportPath>/BHSReports/ATRUtilization</reportPath>
+      <report enabled="True" type="" name="Tag Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/01 BagTagReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
+          <!--<param name="SDO" datatype="DateTime" value="0"></param>-->
         </params>
       </report>
 
-      <report enabled="True" type="" name="Automatic RF Reader Or Writer Report">
-        <reportPath>/BHSReports/AutomaticRFReaderOrWriter</reportPath>
+      <report enabled="True" type="" name="EDS ID Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/02 EDSIDReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-      
-      <report enabled="True" type="" name="Baggage Time Distribution Report">
-        <reportPath>/BHSReports/BaggageTimeDistribution</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="IntervalMin" datatype="Integer" value="30"></param>
         </params>
       </report>
 
-      <report enabled="True" type="" name="Baggage Time Distribution Report 1">
-        <reportPath>/BHSReports/BaggageTimeDistribution_1</reportPath>
+      <report enabled="True" type="" name="Standby Baggage Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/03 StandbyBaggageReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="IntervalMin" datatype="Integer" value="30"></param>
-          <param name="Location" datatype="String" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="" name="Bag Tag Not Found Report">
-        <reportPath>/BHSReports/BagTagNotFound</reportPath>
+      <report enabled="True" type="" name="Sort Correlation Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/04 SortCorrelationReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="ALL" name="Bag Trace Report">
-        <reportPath>/BHSReports/BagTraceAll</reportPath>
+      <report enabled="True" type="" name="MEC Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/09 MECReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="BSM" name="Bag Trace Report">
-        <reportPath>/BHSReports/BagTraceByBSM</reportPath>
+      <report enabled="True" type="" name="Load Balancing Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/10 LoadBalancingReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="BSM" datatype="String" value=""></param>
         </params>
       </report>
 
-      <report enabled="True" type="Flight" name="Bag Trace Report">
-        <reportPath>/BHSReports/BagTraceByFlight</reportPath>
+      <report enabled="True" type="" name="Runout Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/11 RunoutReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
-          <param name="Airline" datatype="String" value=""></param>
         </params>
       </report>
 
-      <report enabled="True" type="GID" name="Bag Trace Report">
-        <reportPath>/BHSReports/BagTraceByGID</reportPath>
+      <report enabled="True" type="" name="ATR Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/12 ATRReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="GID" datatype="String" value=""></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Carousel Output Report">
-        <reportPath>/BHSReports/RacetrackOutputSummary</reportPath>
+      <report enabled="True" type="" name="Day End Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/14 DayEndReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="BSM" name="Checked In Report">
-        <reportPath>/BHSReports/CheckedInBSM</reportPath>
+      <report enabled="True" type="" name="Sort Area Assignment Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/15 SortAreaAssignmentReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
-          <param name="Flight" datatype="String" value=""></param>
         </params>
       </report>
 
-      <report enabled="False" type="Flight" name="Checked In Report">
-        <reportPath>/BHSReports/CheckedInByFlight</reportPath>
+      <report enabled="True" type="" name="Flight Summary Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/16 FlightSummaryReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Check In Bag Count Report">
-        <reportPath>/BHSReports/CheckInInputSummary</reportPath>
+      <report enabled="True" type="" name="Individual Flight Summary Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/17 IndivFlightSummaryReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="Grantt" name="Function Allocation Report">
-        <reportPath>/BHSReports/FunctionAllocationGrantt</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-      </report>
-
-      <report enabled="False" type="List" name="Function Allocation Report">
-        <reportPath>/BHSReports/FunctionAllocationList</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-      </report>
-
-      <report enabled="False" type="" name="GID Used Report">
-        <reportPath>/BHSReports/GIDUsed</reportPath>
+      <report enabled="True" type="" name="Bag Tag NotFound Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/18 BagTagNotFoundReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-       <report enabled="False" type="" name="BSM Report">
-        <reportPath>/BHSReports/BSM</reportPath>
+      <report enabled="True" type="" name="BSM Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/19 BSMReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <!--          <param name="SDO" datatype="DateTime" value="0"></param> -->
-          <param name="Airline" datatype="String" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Current Status Flight Report">
-        <reportPath>/BHSReports/CurrentStatusFlight</reportPath>
+      <report enabled="True" type="" name="Bag Data Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/20 BagDataReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="Flight_Number" datatype="String" value=""></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Day End Report">
-        <reportPath>/BHSReports/DayEnd</reportPath>
+      <report enabled="True" type="" name="EDS Statistics Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/21 EDSStatisticsReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Flight Allocation Report">
-        <reportPath>/BHSReports/FlightAllocation</reportPath>
+      <report enabled="True" type="" name="Critical Tracking PEC Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/22 CriticalTrackingPECReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="ProductionDay" datatype="DateTime" value="0" dateonly="True"></param>
-          <param name="AirlineFlight" datatype="String" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Flight Summary Report">
-        <reportPath>/BHSReports/FlightSummary</reportPath>
+      <report enabled="True" type="" name="Baggage Dimensioning Statistics Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/24 BaggageDimensioningStatisticsReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
         </params>
       </report>
 
-      <report enabled="True" type="Summary(M)" name="HBS Result Report">
-        <authentication>True</authentication>
-        <reportPath>/BHSReports/HBSScreenResultMatrix</reportPath>
+      <report enabled="True" type="" name="CBRA Statistics Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/25 CBRAStatisticsReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="Summary(R)" name="HBS Result Report">
-        <authentication>True</authentication>
-        <reportPath>/BHSReports/HBSScreenResultSummary</reportPath>
+      <report enabled="True" type="" name="Time in System Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/26 TimeinSystemReport </reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="Details" name="HBS Result Report">
-        <authentication>True</authentication>
-        <reportPath>/BHSReports/HBSScreenResultDetails</reportPath>
+      <report enabled="True" type="" name="Bag Trace Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/27 BagTraceReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="False" type="" name="Individual Flight Summary Report">
-        <reportPath>/BHSReports/IndividualFlightSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
-          <param name="Airline" datatype="String" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="" name="Load Balancing Report">
-        <reportPath>/BHSReports/LoadBalancing</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="UnitType" datatype="String" value=""></param>
-          <param name="Interval" datatype="Int" value=""></param>
-        </params>
-      </report>
-
-      <report enabled="True" type="Summary" name="Lost Tracking Report">
-        <reportPath>/BHSReports/LostTrackingSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="True" type="Details" name="Lost Tracking Report">
-        <reportPath>/BHSReports/LostTrackingDetails</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="" name="Sort Correlation Report">
-        <reportPath>/BHSReports/SortCorrelation</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="" name="System Output Report">
-        <reportPath>/BHSReports/SystemOutputSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="" name="Tag Report">
-        <reportPath>/BHSReports/Tag</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="SDO" datatype="DateTime" value="0" dateonly="True"></param>
-          <param name="Airline" datatype="String" value="0"></param>
-        </params>
-      </report>
     </reports>
 
     <reports group="MDS">
-      <report enabled="True" type="Summary" name="Disconnect Report">
-        <reportPath>/BHSReports/DisconnectSummary</reportPath>
+      <!--<report enabled="True" type="" name="Equipment Malfunction Detection">
+		<authentication>True</authentication>
+        <reportPath>/BHSReports/05.1 EquipmentMalfunction_Detection</reportPath>
+        <needDateTimeFormat>True</needDateTimeFormat>
+		<params>
+		</params>
+	  </report>-->
+
+      <report enabled="True" type="" name="Equipment Malfunction Correction">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/05 EquipmentMalfunction_Correction</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="Details" name="Disconnect Report">
-        <reportPath>/BHSReports/DisconnectDetails</reportPath>
+      <report enabled="True" type="" name="Equipment Operational Summary">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/06 EquipOperationalSummary</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-      
-      <report enabled="True" type="Summary" name="Emergency Stop Report">
-        <reportPath>/BHSReports/EStopSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
         </params>
       </report>
 
-      <report enabled="True" type="Details" name="Emergency Stop Report">
-        <reportPath>/BHSReports/EStopDetails</reportPath>
+      <report enabled="True" type="" name="Computer and PLC Status Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/07.1 ComputerandPLCStatusReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
+        </params>
+      </report>
+
+      <report enabled="True" type="" name="Individual PLC Status Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/07.2 IndivPLCStatusReport</reportPath>
+        <needDateTimeFormat>True</needDateTimeFormat>
+        <params>
         </params>
       </report>
 
       <report enabled="True" type="" name="Equipment Malfunction Summary Report">
-        <reportPath>/BHSReports/EquipmentMalfunctionSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="True" type="Summary" name="Fault Report">
-        <reportPath>/BHSReports/FaultSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="True" type="Details" name="Fault Report">
-        <reportPath>/BHSReports/FaultDetails</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="Summary" name="Isolator Off Report">
-        <reportPath>/BHSReports/IsolatorOffSummary</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="False" type="Details" name="Isolator Off Report">
-        <reportPath>/BHSReports/IsolatorOffDetails</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <param name="DTFrom" datatype="DateTime" value="-24"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-        </params>
-      </report>
-
-      <report enabled="True" type="" name="Motor Running Hour Report">
-        <reportPath>/BHSReports/MotorRunningHour</reportPath>
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/08 EquipMalfunctionSummaryReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
         </params>
       </report>
 
-      <report enabled="True" type="" name="Top Faulted Equipment Report">
-        <reportPath>/BHSReports/TopFaultyEquipment</reportPath>
+      <report enabled="True" type="" name="EDS Machine Status Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/13.1 EDSMachineStatusReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-168"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="Rank" datatype="Integer" value="10"></param>
         </params>
       </report>
 
-      <report enabled="True" type="" name="Top Faults Report">
-        <reportPath>/BHSReports/TopFaultType</reportPath>
+      <report enabled="True" type="" name="Individual EDS Status Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/13.2 IndivEDSStatusReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
-          <param name="DTFrom" datatype="DateTime" value="-168"></param>
-          <param name="DTTo" datatype="DateTime" value="0"></param>
-          <param name="Rank" datatype="Integer" value="10"></param>
         </params>
       </report>
 
+      <report enabled="True" type="" name="PEC Tracking Statistics Report">
+        <!--<authentication>True</authentication>-->
+        <reportPath>/BHSReports/23 PECTrackingStatisticsReport</reportPath>
+        <needDateTimeFormat>True</needDateTimeFormat>
+        <params>
+        </params>
+      </report>
     </reports>
+    
   </configSet>
 </application>

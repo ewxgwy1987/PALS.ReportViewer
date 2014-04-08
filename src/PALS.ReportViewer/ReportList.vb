@@ -12,6 +12,10 @@ Imports System.Timers
 Imports System.Xml
 Imports PALS.Utilities
 
+Imports System.Data
+Imports System.Data.SqlClient
+
+
 Public Class ReportList
 
     Private Const NODE_SEPARATER As String = "\"
@@ -30,6 +34,9 @@ Public Class ReportList
     Private m_ParentParentPath As String
     Private m_GlobalInfo As Application.GlobalAppInfo
     Private m_DefaultReportGroup As String
+
+    'Added by Guo Wenyu 2014/04/08
+    Private m_ReportsByUser As Hashtable
 
     ''' -----------------------------------------------------------------------------
     ''' <summary>
@@ -88,7 +95,7 @@ Public Class ReportList
                 XMLFileOfAppSetting = PALS.Utilities.Functions.GetXMLFileFullName("PALS_BASE", "ReportViewer\CFG_Reporting.xml")
 
                 If XMLFileOfAppSetting Is Nothing Then
-                    XMLFileOfAppSetting = PALS.Utilities.Functions.GetXMLFileFullName(String.Empty, "CFG_Reporting.xml")
+                    XMLFileOfAppSetting = PALS.Utilities.Functions.GetXMLFileFullName(String.Empty, "cfg\CFG_Reporting.xml")
 
                     If XMLFileOfAppSetting Is Nothing Then
                         Throw New System.Exception("XML Config file (CFG_Reporting.xml) is unable to be located! " & _
@@ -111,6 +118,8 @@ Public Class ReportList
                 End If
             End If
 
+            m_ReportsByUser = GetReportsByCurrentUser()
+
             Select Case m_GlobalInfo.ReportListStyle
                 Case GUIStype.ListBox
                     SetGUIStyle(GUIStype.ListBox)
@@ -125,6 +134,10 @@ Public Class ReportList
                     FillInTreeView()
             End Select
 
+            'Add by Guo Wenyu 2014/04/08
+            'Access report server to get all report names and paths
+
+
         Catch ex As Exception
             If m_Logger.IsErrorEnabled Then
                 m_Logger.Error("Class:[" & m_ClassName & "] object initialization failure.<" & ThisMethod & _
@@ -137,6 +150,88 @@ Public Class ReportList
             End
         End Try
     End Sub
+    'This function is used to get all reports info from report server database by current logged username
+    Private Function GetReportDataTable(ByVal username As String) As DataTable
+
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Dim dt_reports As DataTable = Nothing
+        Dim ds_reports As New DataSet
+        Dim sqlconn As SqlConnection = Nothing
+        Dim sqlcmd As SqlCommand = Nothing
+        Try
+            sqlconn = New SqlConnection
+            sqlconn.ConnectionString = m_GlobalInfo.DBConnectionString
+            sqlcmd = New SqlCommand(m_GlobalInfo.STP_GetReportsByUser, sqlconn)
+            sqlcmd.CommandType = CommandType.StoredProcedure
+
+            Dim sqlpara As SqlParameter = sqlcmd.Parameters.Add("@UserName", SqlDbType.VarChar, 100)
+            sqlpara.Value = username
+
+            Dim sqladapter As New SqlDataAdapter(sqlcmd)
+
+            sqlconn.Open()
+            sqladapter.Fill(ds_reports)
+            dt_reports = ds_reports.Tables(0)
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+
+        Return dt_reports
+
+    End Function
+
+    'This function is used to get all reports info from report server database by current logged username
+    Private Function GetReportsByCurrentUser() As Hashtable
+
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+        Dim reports As New Hashtable
+
+        Try
+            Dim dt_report_list As DataTable
+            Dim username As String = System.Environment.UserName
+            Dim domain As String = System.Environment.UserDomainName
+
+            dt_report_list = GetReportDataTable(username)
+
+            If Not dt_report_list.Rows.Count > 0 Then
+                dt_report_list = GetReportDataTable(domain + "\" + username)
+            End If
+
+            'Dim i As Integer
+            Dim dr As DataRow = Nothing
+            Dim report_name, report_path As String
+            If dt_report_list.Rows.Count > 0 Then
+                For Each dr In dt_report_list.Rows
+                    report_name = CType(dr("Name"), String)
+                    report_path = CType(dr("Path"), String)
+
+                    If Not reports.Contains(report_path) Then
+                        reports.Add(report_path, report_name)
+                    End If
+
+                Next
+            End If
+
+
+
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+
+        Return reports
+
+    End Function
 
     Private Sub FillInListBox()
         'Fill the report names into the ListBox
@@ -146,17 +241,21 @@ Public Class ReportList
             For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                 RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
 
-                If m_GlobalInfo.ReportGroupCount > 1 Then
-                    lbReports.Items.Add(RptID.Gourp & " " & RptID.Name)
-                Else
-                    m_DefaultReportGroup = RptID.Gourp
-
-                    If m_GlobalInfo.ShowSingleGroupName Then
+                Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
+                If m_ReportsByUser.Contains(report_path) Then
+                    If m_GlobalInfo.ReportGroupCount > 1 Then
                         lbReports.Items.Add(RptID.Gourp & " " & RptID.Name)
                     Else
-                        lbReports.Items.Add(RptID.Name)
+                        m_DefaultReportGroup = RptID.Gourp
+
+                        If m_GlobalInfo.ShowSingleGroupName Then
+                            lbReports.Items.Add(RptID.Gourp & " " & RptID.Name)
+                        Else
+                            lbReports.Items.Add(RptID.Name)
+                        End If
                     End If
                 End If
+
             Next
             HideReportTypes()
             lbReports.SelectedIndex = 0
@@ -181,7 +280,11 @@ Public Class ReportList
                 Dim RptID As ReportIdentity
                 For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                     RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
-                    tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
+
+                    Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
+                    If m_ReportsByUser.Contains(report_path) Then
+                        tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
+                    End If
                 Next
             Else
                 'If there is only one report group is defined in XML file
@@ -198,10 +301,13 @@ Public Class ReportList
                 For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                     RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
 
-                    If m_GlobalInfo.ShowSingleGroupName Then
-                        tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
-                    Else
-                        tvReports.Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
+                    Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
+                    If m_ReportsByUser.Contains(report_path) Then
+                        If m_GlobalInfo.ShowSingleGroupName Then
+                            tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
+                        Else
+                            tvReports.Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
+                        End If
                     End If
                 Next
             End If

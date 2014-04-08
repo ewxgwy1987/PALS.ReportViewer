@@ -46,6 +46,11 @@ Namespace Application
         Private m_Department As String = "CSI"
         Private m_Author As String = "XuJian"
 
+        'Added by Guo Wenyu 2014/04/08
+        Private m_dbconnstring As String
+        Private m_stp_GetReportsByUser As String
+        Private m_ReportsPath As Hashtable
+
         Private m_ReportServerRUL As String
 
         Private m_UserName As String
@@ -98,6 +103,7 @@ Namespace Application
             'Initialize the HashTable for reports.
             m_ReportHashTable = New Hashtable
             m_ReportSyncdHash = Hashtable.Synchronized(m_ReportHashTable)
+            m_ReportsPath = New Hashtable
 
             'Get customized format settings of culture used by current thread. (settings defined by Windows Control Panel/
             'Regional and Language Options/Regional Options/Standards and formats/Customize.../Customize Regional Options.
@@ -242,6 +248,33 @@ Namespace Application
             End Get
             Set(ByVal Value As String)
                 m_Author = Value
+            End Set
+        End Property
+        'Added by Guo Wenyu 2014/04/08
+        Public Property DBConnectionString() As String
+            Get
+                Return m_dbconnstring
+            End Get
+            Set(ByVal Value As String)
+                m_dbconnstring = Value
+            End Set
+        End Property
+        'Added by Guo Wenyu 2014/04/08
+        Public Property STP_GetReportsByUser() As String
+            Get
+                Return m_stp_GetReportsByUser
+            End Get
+            Set(ByVal Value As String)
+                m_stp_GetReportsByUser = Value
+            End Set
+        End Property
+        'Added by Guo Wenyu 2014/04/08
+        Public Property ReportsPath() As Hashtable
+            Get
+                Return m_ReportsPath
+            End Get
+            Set(ByVal value As Hashtable)
+                m_ReportsPath = value
             End Set
         End Property
 

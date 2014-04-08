@@ -54,6 +54,10 @@ Namespace Application
 
         Private Const REPORT_GROUP As String = "Group"
 
+        'Added by Guo Wenyu 2014/04/08 
+        Private Const XML_NODE_DBCONNECTIONSTRING As String = "DBConnectionString"
+        Private Const XML_NODE_GETREPORTSBYUSER As String = "GetReportsByUser"
+
         'The name of current class 
         Private Shared ReadOnly m_ClassName As String = _
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString
@@ -259,6 +263,34 @@ Namespace Application
             '-->
             '<dateFormat valueType="CultureCustomized" valuePart="ShortDatePattern"></dateFormat>
             '<timeFormat valueType="CultureCustomized" valuePart="ShortTimePattern"></timeFormat>
+
+            'Added by Guo Wenyu 2014/04/08
+            'Make report viewer can connect to report server database to get report info by Username
+            Temp = Nothing
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_DBCONNECTIONSTRING, Nothing)
+            If Trim(Temp) = "" Then
+                If m_Logger.IsErrorEnabled Then
+                    m_Logger.Error("The value of " & XML_NODE_DBCONNECTIONSTRING & "is invalid or missing in the config set <" & _
+                                ConfigSet.Name & "> of XML configuration file! <" & ThisMethod & ">")
+                End If
+                Throw New System.Exception("The value of " & XML_NODE_DBCONNECTIONSTRING & _
+                                "is invalid or missing in the XML configuration file!")
+            Else
+                m_GlobalInfo.DBConnectionString = Temp
+            End If
+
+            Temp = Nothing
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_GETREPORTSBYUSER, Nothing)
+            If Trim(Temp) = "" Then
+                If m_Logger.IsErrorEnabled Then
+                    m_Logger.Error("The value of " & XML_NODE_GETREPORTSBYUSER & "is invalid or missing in the config set <" & _
+                                ConfigSet.Name & "> of XML configuration file! <" & ThisMethod & ">")
+                End If
+                Throw New System.Exception("The value of " & XML_NODE_GETREPORTSBYUSER & _
+                                "is invalid or missing in the XML configuration file!")
+            Else
+                m_GlobalInfo.STP_GetReportsByUser = Temp
+            End If
 
             Temp = Nothing
             Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_REPORTSERVERURL, Nothing)
@@ -467,6 +499,11 @@ Namespace Application
                                 Throw New System.Exception("The report path in XML configuration file can not be empty!")
                             Else
                                 Report.ReportPath = Temp
+                            End If
+
+                            '5.1 Set Reports Path map - Guo Wenyu 2014/04/08
+                            If Not m_GlobalInfo.ReportsPath.Contains(Report.Name) Then
+                                m_GlobalInfo.ReportsPath.Add(Report.Name, Report.ReportPath)
                             End If
 
                             '5. Get the needDateTimeFormat -
