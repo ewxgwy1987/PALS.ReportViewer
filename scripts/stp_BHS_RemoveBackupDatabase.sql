@@ -1,0 +1,30 @@
+GO
+USE [BHSDB_CLT];
+GO
+
+create PROCEDURE dbo.stp_BHS_RemoveBackupDatabase
+		  @DATABASE_NAME VARCHAR(50),
+		  @STP_RESULT VARCHAR(50) OUT
+AS
+BEGIN
+
+	SET @STP_RESULT = '';
+
+	IF NOT EXISTS(SELECT name FROM master.sys.sysdatabases WHERE name=@DATABASE_NAME)
+	BEGIN
+		SET @STP_RESULT = 'Database does not exist.'
+		RETURN
+	END
+
+	BEGIN TRY
+
+		EXEC('DROP DATABASE ' + @DATABASE_NAME);
+
+	END TRY
+	BEGIN CATCH
+
+		SELECT @STP_RESULT=ERROR_MESSAGE();
+
+	END CATCH;
+
+END

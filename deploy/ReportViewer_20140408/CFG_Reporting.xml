@@ -26,24 +26,9 @@
 		</root>
 	</log4net>
 
-  <configSet name="Database">
-    <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer;Data Source=EWXGWY1987-PC;Packet Size=4096; Connection Timeout=80</SSRSDBConnStr>
-    <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
-    <SSRSPrdFolder>BHSReports</SSRSPrdFolder>
-    <SSRSHisFolder>BHSReports HIS</SSRSHisFolder>
-
-    <PrdDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT;Data Source=EWXGWY1987-PC;Packet Size=4096; Connection Timeout=80</PrdDBConnStr>
-    <HisDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT_HIS;Data Source=EWXGWY1987-PC;Packet Size=4096; Connection Timeout=80</HisDBConnStr>
-
-    <BackupPath>D:\MS SQLSERVER\Backup</BackupPath>
-    <RestoreMDFPath>D:\MS SQLSERVER\DATA\MDF\BHSDB_CLT_HIS.mdf</RestoreMDFPath>
-    <RestoreLDFPath>D:\MS SQLSERVER\DATA\LDF\BHSDB_CLT_HIS_0.ldf</RestoreLDFPath>
-    <stp_BHS_BackupDatabase>stp_BHS_BackupDatabase</stp_BHS_BackupDatabase>
-    <stp_BHS_RemoveBackupDatabase>stp_BHS_RemoveBackupDatabase</stp_BHS_RemoveBackupDatabase>
-    <stp_BHS_RestoreDatabase>stp_BHS_RestoreDatabase</stp_BHS_RestoreDatabase>
-  </configSet>
-
   <configSet name="Reporting">
+    <DBConnectionString>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer;Data Source=EWXGWY1987-PC\MSSQLSERVERGWY;Packet Size=4096; Connection Timeout=80</DBConnectionString>
+    <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
     <!--
     Global Report Server URL. Individual report can has own reportServerUrl node, so that your
     can print the reports that are located in the different report servers. If the individual report 
@@ -173,18 +158,9 @@
       </report>
 	  -->
 
-      <report enabled="True" type="Production" name="Tag Report">
+      <report enabled="True" type="" name="Tag Report">
         <!--<authentication>True</authentication>-->
         <reportPath>/BHSReports/01 BagTagReport</reportPath>
-        <needDateTimeFormat>True</needDateTimeFormat>
-        <params>
-          <!--<param name="SDO" datatype="DateTime" value="0"></param>-->
-        </params>
-      </report>
-
-      <report enabled="True" type="Historical" name="Tag Report">
-        <!--<authentication>True</authentication>-->
-        <reportPath>/BHSReports HIS/01 BagTagReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
         <params>
           <!--<param name="SDO" datatype="DateTime" value="0"></param>-->

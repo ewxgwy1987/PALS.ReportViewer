@@ -98,8 +98,12 @@ Public Class ReportList
                     XMLFileOfAppSetting = PALS.Utilities.Functions.GetXMLFileFullName(String.Empty, "cfg\CFG_Reporting.xml")
 
                     If XMLFileOfAppSetting Is Nothing Then
-                        Throw New System.Exception("XML Config file (CFG_Reporting.xml) is unable to be located! " & _
-                                                    "Check the Windows Environment Parameter ""PALS_BASE"" setting.")
+                        XMLFileOfAppSetting = PALS.Utilities.Functions.GetXMLFileFullName(String.Empty, "CFG_Reporting.xml")
+
+                        If XMLFileOfAppSetting Is Nothing Then
+                            Throw New System.Exception("XML Config file (CFG_Reporting.xml) is unable to be located! " & _
+                                                        "Check the Windows Environment Parameter ""PALS_BASE"" setting.")
+                        End If
                     End If
                 End If
             End If
@@ -136,7 +140,7 @@ Public Class ReportList
                     FillInTreeView()
             End Select
 
-           
+
             'Add by Guo Wenyu 2014/01/11 for display winform in Extended Monitor
             Dim screen_width As Integer
             Dim screen_heigh As Integer
@@ -147,6 +151,8 @@ Public Class ReportList
             pos_y = CInt(screen_heigh / 2 - Me.ClientSize.Height / 2)
             pos_x = CInt(screen_width / 4 - Me.ClientSize.Width / 2)
             Me.Location = New Point(pos_x, pos_y)
+
+
 
         Catch ex As Exception
             If m_Logger.IsErrorEnabled Then
@@ -161,7 +167,7 @@ Public Class ReportList
         End Try
     End Sub
     'This function is used to get all reports info from report server database by current logged username
-    Private Function GetReportDataTable(ByVal username As String) As DataTable
+    Private Function GetReportDataTable(ByVal username As String, ByVal reportfolder As String) As DataTable
 
         Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
 
@@ -171,12 +177,15 @@ Public Class ReportList
         Dim sqlcmd As SqlCommand = Nothing
         Try
             sqlconn = New SqlConnection
-            sqlconn.ConnectionString = m_GlobalInfo.DBConnectionString
-            sqlcmd = New SqlCommand(m_GlobalInfo.STP_GetReportsByUser, sqlconn)
+            sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString
+            sqlcmd = New SqlCommand(m_GlobalInfo.SSRS_GetReportsByUser, sqlconn)
             sqlcmd.CommandType = CommandType.StoredProcedure
 
             Dim sqlpara As SqlParameter = sqlcmd.Parameters.Add("@UserName", SqlDbType.VarChar, 100)
             sqlpara.Value = username
+
+            Dim sqlpara2 As SqlParameter = sqlcmd.Parameters.Add("@Folder", SqlDbType.VarChar, 100)
+            sqlpara.Value = reportfolder
 
             Dim sqladapter As New SqlDataAdapter(sqlcmd)
 
@@ -206,11 +215,18 @@ Public Class ReportList
             Dim dt_report_list As DataTable
             Dim username As String = System.Environment.UserName
             Dim domain As String = System.Environment.UserDomainName
+            Dim reportfolder As String = "ALL" 'the default folder is BHSReports
 
-            dt_report_list = GetReportDataTable(username)
+            'If Me.rbProduction.Checked = True Then
+            '    reportfolder = m_GlobalInfo.SSRS_ProductionFolder
+            'ElseIf Me.rbHistorical.Checked = True Then
+            '    reportfolder = m_GlobalInfo.SSRS_HistoricalFolder
+            'End If
+
+            dt_report_list = GetReportDataTable(username, reportfolder)
 
             If Not dt_report_list.Rows.Count > 0 Then
-                dt_report_list = GetReportDataTable(domain + "\" + username)
+                dt_report_list = GetReportDataTable(domain + "\" + username, reportfolder)
             End If
 
             'Dim i As Integer
@@ -242,17 +258,57 @@ Public Class ReportList
         Return reports
 
     End Function
+    'Function IsSSRSReport() is used to check the path of the report and its subreports(different types) exists or not in SSRS 
+    Private Function IsSSRSReport(ByRef RptID As ReportIdentity) As Boolean
+        Dim key As String = RptID.Gourp & " " & RptID.Name
+        Dim Rpt As Reporting.Report = CType(m_GlobalInfo.ReportSyncdHash.Item(key), Reporting.Report)
+        Dim report_path As String
+
+        If Not Rpt Is Nothing Then
+            report_path = Rpt.ReportPath
+            If m_ReportsByUser.Contains(report_path) Then
+                Return True
+            End If
+
+            If Rpt.SubReportCount > 0 Then
+                For i As Integer = 0 To Rpt.SubReportCount - 1
+                    If m_ReportsByUser.Contains(Rpt.SubReports(i).ReportPath) Then
+                        Return True
+                    End If
+                Next
+            End If
+        Else
+            Return False
+        End If
+
+        Return False
+
+    End Function
+
+    Private Function IsSSRSReport(ByVal report_uid As String) As Boolean
+
+        Dim report_path As String = CType(m_GlobalInfo.ReportsPathList(report_uid), String)
+
+        If m_ReportsByUser.Contains(report_path) Then
+            Return True
+        Else
+            Return False
+        End If
+
+    End Function
 
     Private Sub FillInListBox()
         'Fill the report names into the ListBox
         If Not m_GlobalInfo.ReportList Is Nothing Then
             Dim RptID As ReportIdentity
 
+            lbReports.Items.Clear() 'Add by Guo Wenyu 2014/04/20
+
             For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                 RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
 
-                Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
-                If m_ReportsByUser.Contains(report_path) Then
+                'Modified by Guo Wenyu 2014/04/21
+                If IsSSRSReport(RptID) Then
                     If m_GlobalInfo.ReportGroupCount > 1 Then
                         lbReports.Items.Add(RptID.Gourp & " " & RptID.Name)
                     Else
@@ -291,8 +347,8 @@ Public Class ReportList
                 For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                     RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
 
-                    Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
-                    If m_ReportsByUser.Contains(report_path) Then
+                    'Modified by Guo Wenyu 2014/04/21
+                    If IsSSRSReport(RptID) Then
                         tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
                     End If
                 Next
@@ -311,8 +367,8 @@ Public Class ReportList
                 For i As Integer = 0 To m_GlobalInfo.ReportList.Count - 1
                     RptID = CType(m_GlobalInfo.ReportList.Item(i), ReportIdentity)
 
-                    Dim report_path As String = CType(m_GlobalInfo.ReportsPath(RptID.Name), String)
-                    If m_ReportsByUser.Contains(report_path) Then
+                    'Modified by Guo Wenyu 2014/04/21
+                    If IsSSRSReport(RptID) Then
                         If m_GlobalInfo.ShowSingleGroupName Then
                             tvReports.Nodes.Item(RptID.Gourp).Nodes.Add(RptID.Name, RptID.Name, "Report1", "Report1")
                         Else
@@ -389,43 +445,50 @@ Public Class ReportList
             End If
         End If
 
+        Dim report_uid As String
         Rpt = CType(m_GlobalInfo.ReportSyncdHash.Item(Name), Reporting.Report)
         If Not Rpt Is Nothing Then
             If Rpt.SubReportCount > 0 Then
                 For i As Integer = 0 To Rpt.SubReportCount - 1
-                    Select Case i
-                        Case 0
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType1.Text = Rpt.SubReports(i).Type
-                                rbType1.Visible = True
-                                rbType1.Checked = True
-                            End If
-                        Case 1
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType2.Text = Rpt.SubReports(i).Type
-                                rbType2.Visible = True
-                            End If
-                        Case 2
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType3.Text = Rpt.SubReports(i).Type
-                                rbType3.Visible = True
-                            End If
-                        Case 3
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType4.Text = Rpt.SubReports(i).Type
-                                rbType4.Visible = True
-                            End If
-                        Case 4
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType5.Text = Rpt.SubReports(i).Type
-                                rbType5.Visible = True
-                            End If
-                        Case 5
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType6.Text = Rpt.SubReports(i).Type
-                                rbType6.Visible = True
-                            End If
-                    End Select
+
+                    report_uid = Rpt.SubReports(i).Name & ";" & Rpt.SubReports(i).Group & ";" & Rpt.SubReports(i).Type
+
+                    'Add code to check if report is authenticated by current user - Modified by Guo Wenyu 2014/04/21
+                    If IsSSRSReport(report_uid) Then
+                        Select Case i
+                            Case 0
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType1.Text = Rpt.SubReports(i).Type
+                                    rbType1.Visible = True
+                                    rbType1.Checked = True
+                                End If
+                            Case 1
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType2.Text = Rpt.SubReports(i).Type
+                                    rbType2.Visible = True
+                                End If
+                            Case 2
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType3.Text = Rpt.SubReports(i).Type
+                                    rbType3.Visible = True
+                                End If
+                            Case 3
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType4.Text = Rpt.SubReports(i).Type
+                                    rbType4.Visible = True
+                                End If
+                            Case 4
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType5.Text = Rpt.SubReports(i).Type
+                                    rbType5.Visible = True
+                                End If
+                            Case 5
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType6.Text = Rpt.SubReports(i).Type
+                                    rbType6.Visible = True
+                                End If
+                        End Select
+                    End If
                 Next
             End If
         End If
@@ -550,42 +613,52 @@ Public Class ReportList
         Name = ComposeReportIdentity(FullPath)
 
         Rpt = CType(m_GlobalInfo.ReportSyncdHash.Item(Name), Reporting.Report)
+
+
+        Dim report_uid As String
+
         If Not Rpt Is Nothing Then
             If Rpt.SubReportCount > 0 Then
                 For i As Integer = 0 To Rpt.SubReportCount - 1
-                    Select Case i
-                        Case 0
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType1.Text = Rpt.SubReports(i).Type
-                                rbType1.Visible = True
-                                rbType1.Checked = True
-                            End If
-                        Case 1
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType2.Text = Rpt.SubReports(i).Type
-                                rbType2.Visible = True
-                            End If
-                        Case 2
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType3.Text = Rpt.SubReports(i).Type
-                                rbType3.Visible = True
-                            End If
-                        Case 3
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType4.Text = Rpt.SubReports(i).Type
-                                rbType4.Visible = True
-                            End If
-                        Case 4
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType5.Text = Rpt.SubReports(i).Type
-                                rbType5.Visible = True
-                            End If
-                        Case 5
-                            If Rpt.SubReports(i).Enabled Then
-                                rbType6.Text = Rpt.SubReports(i).Type
-                                rbType6.Visible = True
-                            End If
-                    End Select
+
+                    report_uid = Rpt.SubReports(i).Name & ";" & Rpt.SubReports(i).Group & ";" & Rpt.SubReports(i).Type
+
+                    'Add code to check if report is authenticated by current user - Modified by Guo Wenyu 2014/04/21
+                    If IsSSRSReport(report_uid) Then
+                        Select Case i
+                            Case 0
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType1.Text = Rpt.SubReports(i).Type
+                                    rbType1.Visible = True
+                                    rbType1.Checked = True
+                                End If
+                            Case 1
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType2.Text = Rpt.SubReports(i).Type
+                                    rbType2.Visible = True
+                                End If
+                            Case 2
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType3.Text = Rpt.SubReports(i).Type
+                                    rbType3.Visible = True
+                                End If
+                            Case 3
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType4.Text = Rpt.SubReports(i).Type
+                                    rbType4.Visible = True
+                                End If
+                            Case 4
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType5.Text = Rpt.SubReports(i).Type
+                                    rbType5.Visible = True
+                                End If
+                            Case 5
+                                If Rpt.SubReports(i).Enabled Then
+                                    rbType6.Text = Rpt.SubReports(i).Type
+                                    rbType6.Visible = True
+                                End If
+                        End Select
+                    End If
                 Next
             End If
         End If
@@ -684,5 +757,188 @@ Public Class ReportList
         Dim version As String = Me.GetType.Assembly.GetName.Version.ToString
 
         MsgBox("PALS Report Viewer" & vbCrLf & vbCrLf & "Assembly: " & vbTab & assembly & vbCrLf & "Version#: " & vbTab & version, MsgBoxStyle.Information, "Application Info")
+    End Sub
+
+    Private Sub btnBackup_Click(sender As System.Object, e As System.EventArgs) Handles btnBackup.Click
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Dim sqlconn As SqlConnection = Nothing
+        Dim sqlcmd As SqlCommand = Nothing
+
+        Dim stp_result As String = ""
+
+        Try
+            sqlconn = New SqlConnection
+            sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
+            sqlcmd = New SqlCommand(m_GlobalInfo.STP_BackupDatabase, sqlconn)
+            sqlcmd.CommandType = CommandType.StoredProcedure
+
+            Dim sqlpara_dbname As SqlParameter = sqlcmd.Parameters.Add("@DATABASE_NAME", SqlDbType.VarChar, 50)
+            sqlpara_dbname.Value = m_GlobalInfo.PRD_DBName
+            sqlpara_dbname.Direction = ParameterDirection.Input
+
+            Dim sqlpara_bakpath As SqlParameter = sqlcmd.Parameters.Add("@BACKUP_DIRPATH", SqlDbType.VarChar, 1000)
+            sqlpara_bakpath.Value = m_GlobalInfo.BackupPath
+            sqlpara_dbname.Direction = ParameterDirection.Input
+
+            Dim sqlpara_stpres As SqlParameter = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
+            sqlpara_stpres.Value = stp_result
+            sqlpara_dbname.Direction = ParameterDirection.Output
+
+            sqlcmd.ExecuteNonQuery()
+
+            If stp_result <> String.Empty Then
+                Dim err_str As String = ""
+
+                err_str += "Application Error: Database<" & m_GlobalInfo.PRD_DBName & "> backup failed.(" & stp_result & ")"
+
+                If m_Logger.IsErrorEnabled Then
+                    m_Logger.Error(err_str)
+                End If
+                MsgBox(err_str, MsgBoxStyle.Critical, "System Error")
+            Else
+                Dim info_str As String = ""
+                info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> backup to " & m_GlobalInfo.BackupPath & " successfully."
+                MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
+            End If
+
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+
+
+    End Sub
+
+    Private Sub btnRestore_Click(sender As System.Object, e As System.EventArgs) Handles btnRestore.Click
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Dim sqlconn As SqlConnection = Nothing
+        Dim sqlcmd As SqlCommand = Nothing
+
+        Dim stp_result As String = ""
+        Dim prompt_str As String
+
+        Try
+
+            prompt_str = "Before Restoring database, you must remove database<" & m_GlobalInfo.HIS_DBName & "> at first. Do you want to continue?"
+            Dim msgres As Integer
+            msgres = MsgBox(prompt_str, MsgBoxStyle.YesNo Or MsgBoxStyle.DefaultButton2 Or MsgBoxStyle.Question, "Remove Database <" & m_GlobalInfo.HIS_DBName & "> ?")
+
+            If msgres = 6 Then 'Msgbox with 'YES' button clicked
+
+                'At first remove original backupped database
+                sqlconn = New SqlConnection
+                sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
+                sqlcmd = New SqlCommand(m_GlobalInfo.STP_RemoveBackupDatabase, sqlconn)
+                sqlcmd.CommandType = CommandType.StoredProcedure
+
+                Dim sqlpara_dbname As SqlParameter = sqlcmd.Parameters.Add("@DATABASE_NAME", SqlDbType.VarChar, 50)
+                sqlpara_dbname.Value = m_GlobalInfo.HIS_DBName
+                sqlpara_dbname.Direction = ParameterDirection.Input
+
+                Dim sqlpara_stpres As SqlParameter = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
+                sqlpara_stpres.Value = stp_result
+                sqlpara_dbname.Direction = ParameterDirection.Output
+
+                sqlcmd.ExecuteNonQuery()
+
+                If stp_result = String.Empty Or stp_result = "Database does not exist." Then
+                    Dim info_str As String = ""
+                    If stp_result = String.Empty Then
+                        info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> Removed successfully."
+                    Else
+                        info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> does not exist. No need to remove."
+                    End If
+
+                    MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
+
+                    'Then pop up window to select the database backup file to restore
+                    Dim backup_filepath As String = ""
+                    Me.OpenBackupFileDialog.InitialDirectory = m_GlobalInfo.BackupPath
+                    Dim openres As DialogResult = Me.OpenBackupFileDialog.ShowDialog()
+
+                    If openres = DialogResult.OK Then
+                        backup_filepath = Me.OpenBackupFileDialog.FileName
+
+                        'Restore the selected backup file to restore database
+                        stp_result = ""
+                        sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
+                        sqlcmd = New SqlCommand(m_GlobalInfo.STP_RestoreDatabase, sqlconn)
+                        sqlcmd.CommandType = CommandType.StoredProcedure
+
+                        sqlpara_dbname = sqlcmd.Parameters.Add("@DATABASE_NAME", SqlDbType.VarChar, 50)
+                        sqlpara_dbname.Value = m_GlobalInfo.HIS_DBName
+                        sqlpara_dbname.Direction = ParameterDirection.Input
+
+                        Dim sqlpara_bakpath As SqlParameter = sqlcmd.Parameters.Add("@BACKUP_FILEPATH", SqlDbType.VarChar, 1000)
+                        sqlpara_dbname.Value = backup_filepath
+                        sqlpara_dbname.Direction = ParameterDirection.Input
+
+                        Dim sqlpara_mdfpath As SqlParameter = sqlcmd.Parameters.Add("@MDF_FILEPATH", SqlDbType.VarChar, 1000)
+                        sqlpara_dbname.Value = m_GlobalInfo.RestoreMDFPath
+                        sqlpara_dbname.Direction = ParameterDirection.Input
+
+                        Dim sqlpara_ldfpath As SqlParameter = sqlcmd.Parameters.Add("@LDF_FILEPATH", SqlDbType.VarChar, 1000)
+                        sqlpara_dbname.Value = m_GlobalInfo.RestoreLDFPath
+                        sqlpara_dbname.Direction = ParameterDirection.Input
+
+                        sqlpara_stpres = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
+                        sqlpara_stpres.Value = stp_result
+                        sqlpara_dbname.Direction = ParameterDirection.Output
+
+                        sqlcmd.ExecuteNonQuery()
+
+                        If stp_result <> String.Empty Then
+                            Dim err_str As String = ""
+
+                            err_str += "Application Error: Database<" & m_GlobalInfo.PRD_DBName & "> restore failed.(" & stp_result & ")"
+
+                            If m_Logger.IsErrorEnabled Then
+                                m_Logger.Error(err_str)
+                            End If
+                            MsgBox(err_str, MsgBoxStyle.Critical, "System Error")
+                        Else
+                            info_str = ""
+                            info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> restore successfully."
+                            MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
+                        End If
+                    End If
+
+
+                Else
+                    Dim err_str As String = ""
+
+                    err_str += "Application Error: Database<" & m_GlobalInfo.PRD_DBName & "> restore failed.(" & stp_result & ")"
+
+                    If m_Logger.IsErrorEnabled Then
+                        m_Logger.Error(err_str)
+                    End If
+                    MsgBox(err_str, MsgBoxStyle.Critical, "System Error")
+                End If
+            End If
+
+
+
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+    End Sub
+
+    Private Sub rbProduction_CheckedChanged(sender As System.Object, e As System.EventArgs)
+
+    End Sub
+
+    Private Sub rbHistorical_CheckedChanged(sender As System.Object, e As System.EventArgs)
+
     End Sub
 End Class

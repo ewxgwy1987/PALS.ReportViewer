@@ -38,6 +38,9 @@ Partial Class ReportList
         Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
         Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.ApplicationInfoToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.btnBackup = New System.Windows.Forms.Button()
+        Me.btnRestore = New System.Windows.Forms.Button()
+        Me.OpenBackupFileDialog = New System.Windows.Forms.OpenFileDialog()
         Me.gbType.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
@@ -147,7 +150,7 @@ Partial Class ReportList
         'btnPreview
         '
         Me.btnPreview.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreview.Location = New System.Drawing.Point(407, 207)
+        Me.btnPreview.Location = New System.Drawing.Point(407, 281)
         Me.btnPreview.Name = "btnPreview"
         Me.btnPreview.Size = New System.Drawing.Size(75, 21)
         Me.btnPreview.TabIndex = 3
@@ -158,7 +161,7 @@ Partial Class ReportList
         '
         Me.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(407, 234)
+        Me.btnClose.Location = New System.Drawing.Point(407, 308)
         Me.btnClose.Name = "btnClose"
         Me.btnClose.Size = New System.Drawing.Size(75, 21)
         Me.btnClose.TabIndex = 4
@@ -171,7 +174,7 @@ Partial Class ReportList
         Me.lbReports.FormattingEnabled = True
         Me.lbReports.Location = New System.Drawing.Point(10, 11)
         Me.lbReports.Name = "lbReports"
-        Me.lbReports.Size = New System.Drawing.Size(348, 238)
+        Me.lbReports.Size = New System.Drawing.Size(348, 225)
         Me.lbReports.TabIndex = 5
         '
         'tvReports
@@ -184,7 +187,7 @@ Partial Class ReportList
         Me.tvReports.Name = "tvReports"
         Me.tvReports.SelectedImageIndex = 2
         Me.tvReports.ShowNodeToolTips = True
-        Me.tvReports.Size = New System.Drawing.Size(348, 255)
+        Me.tvReports.Size = New System.Drawing.Size(348, 328)
         Me.tvReports.TabIndex = 6
         '
         'ImageList1
@@ -208,14 +211,40 @@ Partial Class ReportList
         Me.ApplicationInfoToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
         Me.ApplicationInfoToolStripMenuItem.Text = "Application Info..."
         '
+        'btnBackup
+        '
+        Me.btnBackup.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnBackup.Location = New System.Drawing.Point(407, 225)
+        Me.btnBackup.Name = "btnBackup"
+        Me.btnBackup.Size = New System.Drawing.Size(75, 21)
+        Me.btnBackup.TabIndex = 3
+        Me.btnBackup.Text = "Backup"
+        Me.btnBackup.UseVisualStyleBackColor = True
+        '
+        'btnRestore
+        '
+        Me.btnRestore.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnRestore.Location = New System.Drawing.Point(407, 253)
+        Me.btnRestore.Name = "btnRestore"
+        Me.btnRestore.Size = New System.Drawing.Size(75, 21)
+        Me.btnRestore.TabIndex = 3
+        Me.btnRestore.Text = "Restore"
+        Me.btnRestore.UseVisualStyleBackColor = True
+        '
+        'OpenBackupFileDialog
+        '
+        Me.OpenBackupFileDialog.FileName = "OpenBackupFileDialog"
+        '
         'ReportList
         '
         Me.AcceptButton = Me.btnPreview
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnClose
-        Me.ClientSize = New System.Drawing.Size(494, 278)
+        Me.ClientSize = New System.Drawing.Size(494, 350)
         Me.ContextMenuStrip = Me.ContextMenuStrip1
+        Me.Controls.Add(Me.btnRestore)
+        Me.Controls.Add(Me.btnBackup)
         Me.Controls.Add(Me.tvReports)
         Me.Controls.Add(Me.gbType)
         Me.Controls.Add(Me.lbReports)
@@ -224,11 +253,9 @@ Partial Class ReportList
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
-        Me.MinimizeBox = False
         Me.Name = "ReportList"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Select BHS Report"
-        Me.TopMost = True
         Me.gbType.ResumeLayout(False)
         Me.gbType.PerformLayout()
         Me.ContextMenuStrip1.ResumeLayout(False)
@@ -249,5 +276,8 @@ Partial Class ReportList
     Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
     Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents ApplicationInfoToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents btnBackup As System.Windows.Forms.Button
+    Friend WithEvents btnRestore As System.Windows.Forms.Button
+    Friend WithEvents OpenBackupFileDialog As System.Windows.Forms.OpenFileDialog
 
 End Class

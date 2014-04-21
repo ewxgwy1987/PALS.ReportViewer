@@ -54,9 +54,20 @@ Namespace Application
 
         Private Const REPORT_GROUP As String = "Group"
 
-        'Added by Guo Wenyu 2014/04/08 
-        Private Const XML_NODE_DBCONNECTIONSTRING As String = "DBConnectionString"
-        Private Const XML_NODE_GETREPORTSBYUSER As String = "GetReportsByUser"
+        'Modified by Guo Wenyu 2014/04/14
+        Private Const CONFIGSET_DATABASE As String = "Database"
+        Private Const XML_NODE_SSRS_DBCONNSTRING As String = "SSRSDBConnStr"
+        Private Const XML_NODE_SSRS_GETREPORTSBYUSER As String = "GetReportsByUser"
+        Private Const XML_NODE_SSRS_PRODUCTIONFOLDER As String = "SSRSPrdFolder"
+        Private Const XML_NODE_SSRS_HISTORICALFOLDER As String = "SSRSHisFolder"
+        Private Const XML_NODE_PRD_DBCONNSTRING As String = "PrdDBConnStr"
+        Private Const XML_NODE_HIS_DBCONNSTRING As String = "HisDBConnStr"
+        Private Const XML_NODE_BACKUP_PATH As String = "BackupPath"
+        Private Const XML_NODE_RESTORE_MDFPATH As String = "RestoreMDFPath"
+        Private Const XML_NODE_RESTORE_LDFPATH As String = "RestoreLDFPath"
+        Private Const XML_NODE_STP_BACKUPDATABASE As String = "stp_BHS_BackupDatabase"
+        Private Const XML_NODE_STP_REMOVEBACKUPDATABASE As String = "stp_BHS_RemoveBackupDatabase"
+        Private Const XML_NODE_STP_RESTOREDATABASE As String = "stp_BHS_RestoreDatabase"
 
         'The name of current class 
         Private Shared ReadOnly m_ClassName As String = _
@@ -174,6 +185,22 @@ Namespace Application
                     m_GlobalInfo.Author = XMLConfig.GetSettingFromInnerText(GeneralAppInfoConfigSet, "author", "XuJian")
                 End If
 
+                'Step 2: Read Database config setting parameters -- by Guo Wenyu 2014/04/17
+                Dim DatabaseSet As XmlNode
+                DatabaseSet = XMLConfig.GetConfigSetElement(m_ConfigRoot, "configSet", "name", CONFIGSET_DATABASE)
+                If DatabaseSet Is Nothing Then
+                    If m_Logger.IsErrorEnabled Then
+                        m_Logger.Error("There is no """ & CONFIGSET_DATABASE & _
+                                """ configSet in the XML config file! <" & _
+                                ThisMethod & ">")
+                    End If
+                    Return False
+                Else
+                    'Read report information from XML configuration file
+                    GetDatabaseInfoFromXML(DatabaseSet)
+
+                End If
+
                 'Step 3: Create MessageHandler object.
                 Dim ReportingSet As XmlNode
                 ReportingSet = XMLConfig.GetConfigSetElement(m_ConfigRoot, "configSet", "name", CONFIGSET_REPORTING)
@@ -201,6 +228,189 @@ Namespace Application
                 Return False
             End Try
         End Function
+        Private Sub LogXMLError(XML_NODE As String, ConfigSetName As String, ThisMethod As String)
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("The value of " & XML_NODE & "is invalid or missing in the config set <" & _
+                            ConfigSetName & "> of XML configuration file! <" & ThisMethod & ">")
+            End If
+            Throw New System.Exception("The value of " & XML_NODE & _
+                            "is invalid or missing in the XML configuration file!")
+        End Sub
+
+        Private Function GetDatabaseNameFromConnString(connstring As String) As String
+            Dim database_idx As Integer
+            Dim equalsign_idx As Integer
+            Dim semicolon_idx As Integer
+            Dim database_name As String = ""
+
+            database_idx = connstring.IndexOf("Initial Catalog")
+            If database_idx = -1 Then
+                Return ""
+            End If
+
+            semicolon_idx = connstring.IndexOf(";", database_idx)
+            If database_idx = -1 Then
+                semicolon_idx = connstring.Length - 1
+            End If
+
+            equalsign_idx = connstring.IndexOf("=", database_idx, semicolon_idx - database_idx)
+            If database_idx = -1 Then
+                Return ""
+            End If
+
+            database_name = connstring.Substring(equalsign_idx + 1, semicolon_idx - equalsign_idx - 1).Trim()
+
+            Return database_name
+        End Function
+
+        '<configSet name="Database">
+        '    <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</SSRSDBConnStr>
+        '    <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
+        '    <SSRSPrdFolder>BHSReports</SSRSPrdFolder>
+        '    <SSRSHisFolder>BHSReports HIS</SSRSHisFolder>
+
+        '    <PrdDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</PrdDBConnStr>
+        '    <HisDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT_HIS;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</HisDBConnStr>
+
+        '    <BackupPath>D:\MS SQLSERVER\Backup</BackupPath>
+        '    <RestoreMDFPath>D:\MS SQLSERVER\DATA\MDF\BHSDB_CLT_HIS.mdf</RestoreMDFPath>
+        '    <RestoreLDFPath>D:\MS SQLSERVER\DATA\LDF\BHSDB_CLT_HIS_0.ldf</RestoreLDFPath>
+        '</configSet>
+
+
+        'The function used to get all config set about database by Guo Wenyu 2014/04/08
+        Private Sub GetDatabaseInfoFromXML(ByRef ConfigSet As XmlNode)
+            Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+            Dim Temp As String
+            Dim crr_xmlnode As String
+
+            'Set SSRS DB Connection String to connect report server database
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_DBCONNSTRING
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_DBConnString = Temp
+            End If
+
+            'Set SSRS store procedure to get reports list by username
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_GETREPORTSBYUSER
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_GetReportsByUser = Temp
+            End If
+
+            'Set SSRS production folder
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_PRODUCTIONFOLDER
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_ProductionFolder = Temp
+            End If
+
+            'Set SSRS historical folder
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_HISTORICALFOLDER
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_HistoricalFolder = Temp
+            End If
+
+            'Set production DB connection string
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_PRD_DBCONNSTRING
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.PRD_DBconnstring = Temp
+            End If
+
+            'Set production DB name
+            m_GlobalInfo.PRD_DBName = GetDatabaseNameFromConnString(m_GlobalInfo.PRD_DBconnstring)
+
+            'Set historical DB connection string
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_HIS_DBCONNSTRING
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.HIS_DBconnstring = Temp
+            End If
+
+            'Set historical DB name
+            m_GlobalInfo.HIS_DBName = GetDatabaseNameFromConnString(m_GlobalInfo.HIS_DBconnstring)
+
+            'Set backup directory path
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_BACKUP_PATH
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.BackupPath = Temp
+            End If
+
+            'Set Restore MDF file path
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_RESTORE_MDFPATH
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.RestoreMDFPath = Temp
+            End If
+
+            'Set Restore LDF file path
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_RESTORE_LDFPATH
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.RestoreLDFPath = Temp
+            End If
+
+            'Set store procedure to backup database
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_STP_BACKUPDATABASE
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.STP_BackupDatabase = Temp
+            End If
+
+            'Set store procedure to remove backup database
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_STP_REMOVEBACKUPDATABASE
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.STP_RemoveBackupDatabase = Temp
+            End If
+
+            'Set store procedure to restore backup database
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_STP_RESTOREDATABASE
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.STP_RestoreDatabase = Temp
+            End If
+
+        End Sub
 
         '<reports group="MDS">
         '   <report enabled="True" type="Statistic" name="Equipment Fault Report">
@@ -264,33 +474,8 @@ Namespace Application
             '<dateFormat valueType="CultureCustomized" valuePart="ShortDatePattern"></dateFormat>
             '<timeFormat valueType="CultureCustomized" valuePart="ShortTimePattern"></timeFormat>
 
-            'Added by Guo Wenyu 2014/04/08
-            'Make report viewer can connect to report server database to get report info by Username
-            Temp = Nothing
-            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_DBCONNECTIONSTRING, Nothing)
-            If Trim(Temp) = "" Then
-                If m_Logger.IsErrorEnabled Then
-                    m_Logger.Error("The value of " & XML_NODE_DBCONNECTIONSTRING & "is invalid or missing in the config set <" & _
-                                ConfigSet.Name & "> of XML configuration file! <" & ThisMethod & ">")
-                End If
-                Throw New System.Exception("The value of " & XML_NODE_DBCONNECTIONSTRING & _
-                                "is invalid or missing in the XML configuration file!")
-            Else
-                m_GlobalInfo.DBConnectionString = Temp
-            End If
 
-            Temp = Nothing
-            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_GETREPORTSBYUSER, Nothing)
-            If Trim(Temp) = "" Then
-                If m_Logger.IsErrorEnabled Then
-                    m_Logger.Error("The value of " & XML_NODE_GETREPORTSBYUSER & "is invalid or missing in the config set <" & _
-                                ConfigSet.Name & "> of XML configuration file! <" & ThisMethod & ">")
-                End If
-                Throw New System.Exception("The value of " & XML_NODE_GETREPORTSBYUSER & _
-                                "is invalid or missing in the XML configuration file!")
-            Else
-                m_GlobalInfo.STP_GetReportsByUser = Temp
-            End If
+
 
             Temp = Nothing
             Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, XML_NODE_REPORTSERVERURL, Nothing)
@@ -502,8 +687,10 @@ Namespace Application
                             End If
 
                             '5.1 Set Reports Path map - Guo Wenyu 2014/04/08
-                            If Not m_GlobalInfo.ReportsPath.Contains(Report.Name) Then
-                                m_GlobalInfo.ReportsPath.Add(Report.Name, Report.ReportPath)
+                            'Report unique key is Report.G
+                            Dim report_id As String = Report.Name & ";" & Report.Group & ";" & Report.Type
+                            If Not m_GlobalInfo.ReportsPathList.Contains(report_id) Then
+                                m_GlobalInfo.ReportsPathList.Add(report_id, Report.ReportPath)
                             End If
 
                             '5. Get the needDateTimeFormat -

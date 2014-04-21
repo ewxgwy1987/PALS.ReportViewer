@@ -47,9 +47,21 @@ Namespace Application
         Private m_Author As String = "XuJian"
 
         'Added by Guo Wenyu 2014/04/08
-        Private m_dbconnstring As String
-        Private m_stp_GetReportsByUser As String
-        Private m_ReportsPath As Hashtable
+        Private m_SSRS_DBconnstring As String
+        Private m_SSRS_stp_GetReportsByUser As String
+        Private m_SSRS_ProductionFolder As String
+        Private m_SSRS_HistoricalFolder As String
+        Private m_Prd_DBconnstring As String
+        Private m_Prd_DBName As String
+        Private m_His_DBconnstring As String
+        Private m_His_DBName As String
+        Private m_Backup_Path As String
+        Private m_Restore_MDFPath As String
+        Private m_Restore_LDFPath As String
+        Private m_stp_BackupDatabase As String
+        Private m_stp_RemoveBackupDatabase As String
+        Private m_stp_RestoreDatabase As String
+        Private m_HT_ReportsPath As Hashtable
 
         Private m_ReportServerRUL As String
 
@@ -103,7 +115,7 @@ Namespace Application
             'Initialize the HashTable for reports.
             m_ReportHashTable = New Hashtable
             m_ReportSyncdHash = Hashtable.Synchronized(m_ReportHashTable)
-            m_ReportsPath = New Hashtable
+            m_HT_ReportsPath = New Hashtable
 
             'Get customized format settings of culture used by current thread. (settings defined by Windows Control Panel/
             'Regional and Language Options/Regional Options/Standards and formats/Customize.../Customize Regional Options.
@@ -250,33 +262,143 @@ Namespace Application
                 m_Author = Value
             End Set
         End Property
-        'Added by Guo Wenyu 2014/04/08
-        Public Property DBConnectionString() As String
+#Region "The property of database by Guo Wenyu 2014/04/08"
+
+        Public Property SSRS_DBConnString() As String
             Get
-                Return m_dbconnstring
+                Return m_SSRS_DBconnstring
             End Get
             Set(ByVal Value As String)
-                m_dbconnstring = Value
+                m_SSRS_DBconnstring = Value
             End Set
         End Property
-        'Added by Guo Wenyu 2014/04/08
-        Public Property STP_GetReportsByUser() As String
+
+        Public Property SSRS_GetReportsByUser() As String
             Get
-                Return m_stp_GetReportsByUser
+                Return m_SSRS_stp_GetReportsByUser
             End Get
             Set(ByVal Value As String)
-                m_stp_GetReportsByUser = Value
+                m_SSRS_stp_GetReportsByUser = Value
             End Set
         End Property
-        'Added by Guo Wenyu 2014/04/08
-        Public Property ReportsPath() As Hashtable
+
+        Public Property SSRS_ProductionFolder() As String
             Get
-                Return m_ReportsPath
+                Return m_SSRS_ProductionFolder
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_ProductionFolder = Value
+            End Set
+        End Property
+
+        Public Property SSRS_HistoricalFolder() As String
+            Get
+                Return m_SSRS_HistoricalFolder
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_HistoricalFolder = Value
+            End Set
+        End Property
+
+        Public Property PRD_DBconnstring() As String
+            Get
+                Return m_Prd_DBconnstring
+            End Get
+            Set(ByVal Value As String)
+                m_Prd_DBconnstring = Value
+            End Set
+        End Property
+
+        Public Property PRD_DBName() As String
+            Get
+                Return m_Prd_DBName
+            End Get
+            Set(ByVal Value As String)
+                m_Prd_DBName = Value
+            End Set
+        End Property
+
+        Public Property HIS_DBconnstring() As String
+            Get
+                Return m_His_DBconnstring
+            End Get
+            Set(ByVal Value As String)
+                m_His_DBconnstring = Value
+            End Set
+        End Property
+
+        Public Property HIS_DBName() As String
+            Get
+                Return m_His_DBName
+            End Get
+            Set(ByVal Value As String)
+                m_His_DBName = Value
+            End Set
+        End Property
+
+        Public Property BackupPath() As String
+            Get
+                Return m_Backup_Path
+            End Get
+            Set(ByVal Value As String)
+                m_Backup_Path = Value
+            End Set
+        End Property
+
+        Public Property RestoreMDFPath() As String
+            Get
+                Return m_Restore_MDFPath
+            End Get
+            Set(ByVal Value As String)
+                m_Restore_MDFPath = Value
+            End Set
+        End Property
+
+        Public Property RestoreLDFPath() As String
+            Get
+                Return m_Restore_LDFPath
+            End Get
+            Set(ByVal Value As String)
+                m_Restore_LDFPath = Value
+            End Set
+        End Property
+
+        Public Property STP_BackupDatabase() As String
+            Get
+                Return m_stp_BackupDatabase
+            End Get
+            Set(ByVal Value As String)
+                m_stp_BackupDatabase = Value
+            End Set
+        End Property
+
+        Public Property STP_RemoveBackupDatabase() As String
+            Get
+                Return m_stp_RemoveBackupDatabase
+            End Get
+            Set(ByVal Value As String)
+                m_stp_RemoveBackupDatabase = Value
+            End Set
+        End Property
+
+        Public Property STP_RestoreDatabase() As String
+            Get
+                Return m_stp_RestoreDatabase
+            End Get
+            Set(ByVal Value As String)
+                m_stp_RestoreDatabase = Value
+            End Set
+        End Property
+
+        Public Property ReportsPathList() As Hashtable
+            Get
+                Return m_HT_ReportsPath
             End Get
             Set(ByVal value As Hashtable)
-                m_ReportsPath = value
+                m_HT_ReportsPath = value
             End Set
         End Property
+#End Region
 
         Public Property ReportServerRUL() As String
             Get
