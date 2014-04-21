@@ -2,7 +2,7 @@ GO
 USE [BHSDB_CLT];
 GO
 
-create PROCEDURE dbo.stp_BHS_RemoveBackupDatabase
+Alter PROCEDURE dbo.stp_BHS_RemoveBackupDatabase
 		  @DATABASE_NAME VARCHAR(50),
 		  @STP_RESULT VARCHAR(50) OUT
 AS

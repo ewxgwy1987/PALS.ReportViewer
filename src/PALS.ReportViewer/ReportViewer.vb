@@ -308,6 +308,6 @@ Public Class ReportViewer
     End Sub
 
     Private Sub rptViewer_ViewButtonClick(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles rptViewer.ViewButtonClick
-        rptViewer.RefreshReport()
+        'rptViewer.RefreshReport()
     End Sub
 End Class

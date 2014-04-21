@@ -3,7 +3,7 @@ USE [ReportServer1];
 GO
 
 
-create PROCEDURE dbo.stp_BHS_MIS_GetReportsByUser
+ALTER PROCEDURE dbo.stp_BHS_MIS_GetReportsByUser
 		  @UserName varchar(100),
 		  @Folder varchar(50)
 AS

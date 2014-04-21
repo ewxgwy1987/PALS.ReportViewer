@@ -185,7 +185,7 @@ Public Class ReportList
             sqlpara.Value = username
 
             Dim sqlpara2 As SqlParameter = sqlcmd.Parameters.Add("@Folder", SqlDbType.VarChar, 100)
-            sqlpara.Value = reportfolder
+            sqlpara2.Value = reportfolder
 
             Dim sqladapter As New SqlDataAdapter(sqlcmd)
 
@@ -266,8 +266,10 @@ Public Class ReportList
 
         If Not Rpt Is Nothing Then
             report_path = Rpt.ReportPath
-            If m_ReportsByUser.Contains(report_path) Then
-                Return True
+            If Not report_path Is Nothing Then
+                If m_ReportsByUser.Contains(report_path) Then
+                    Return True
+                End If
             End If
 
             If Rpt.SubReportCount > 0 Then
@@ -394,7 +396,7 @@ Public Class ReportList
 
     Private Sub SetGUIStyle(ByVal Style As GUIStype)
         Dim Loc As New Point(10, 12)
-        Dim BoxSize As New Size(348, 264)
+        Dim BoxSize As New Size(348, 355)
 
         lbReports.Location = Loc
         lbReports.Size = BoxSize
@@ -779,13 +781,14 @@ Public Class ReportList
 
             Dim sqlpara_bakpath As SqlParameter = sqlcmd.Parameters.Add("@BACKUP_DIRPATH", SqlDbType.VarChar, 1000)
             sqlpara_bakpath.Value = m_GlobalInfo.BackupPath
-            sqlpara_dbname.Direction = ParameterDirection.Input
+            sqlpara_bakpath.Direction = ParameterDirection.Input
 
             Dim sqlpara_stpres As SqlParameter = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
-            sqlpara_stpres.Value = stp_result
-            sqlpara_dbname.Direction = ParameterDirection.Output
+            sqlpara_stpres.Direction = ParameterDirection.Output
 
+            sqlconn.Open()
             sqlcmd.ExecuteNonQuery()
+            stp_result = CType(sqlpara_stpres.Value, String)
 
             If stp_result <> String.Empty Then
                 Dim err_str As String = ""
@@ -820,7 +823,7 @@ Public Class ReportList
         Dim sqlconn As SqlConnection = Nothing
         Dim sqlcmd As SqlCommand = Nothing
 
-        Dim stp_result As String = ""
+        Dim stp_result As String = "22"
         Dim prompt_str As String
 
         Try
@@ -842,17 +845,18 @@ Public Class ReportList
                 sqlpara_dbname.Direction = ParameterDirection.Input
 
                 Dim sqlpara_stpres As SqlParameter = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
-                sqlpara_stpres.Value = stp_result
-                sqlpara_dbname.Direction = ParameterDirection.Output
+                sqlpara_stpres.Direction = ParameterDirection.Output
 
+                sqlconn.Open()
                 sqlcmd.ExecuteNonQuery()
+                stp_result = CType(sqlpara_stpres.Value, String)
 
                 If stp_result = String.Empty Or stp_result = "Database does not exist." Then
                     Dim info_str As String = ""
                     If stp_result = String.Empty Then
-                        info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> Removed successfully."
+                        info_str += "Database<" & m_GlobalInfo.HIS_DBName & "> Removed successfully."
                     Else
-                        info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> does not exist. No need to remove."
+                        info_str += "Database<" & m_GlobalInfo.HIS_DBName & "> does not exist. No need to remove."
                     End If
 
                     MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
@@ -860,6 +864,7 @@ Public Class ReportList
                     'Then pop up window to select the database backup file to restore
                     Dim backup_filepath As String = ""
                     Me.OpenBackupFileDialog.InitialDirectory = m_GlobalInfo.BackupPath
+                    Me.OpenBackupFileDialog.FileName = ""
                     Dim openres As DialogResult = Me.OpenBackupFileDialog.ShowDialog()
 
                     If openres = DialogResult.OK Then
@@ -867,36 +872,40 @@ Public Class ReportList
 
                         'Restore the selected backup file to restore database
                         stp_result = ""
+                        sqlconn = New SqlConnection
                         sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
+
                         sqlcmd = New SqlCommand(m_GlobalInfo.STP_RestoreDatabase, sqlconn)
                         sqlcmd.CommandType = CommandType.StoredProcedure
+                        sqlcmd.CommandTimeout = 1800
 
                         sqlpara_dbname = sqlcmd.Parameters.Add("@DATABASE_NAME", SqlDbType.VarChar, 50)
                         sqlpara_dbname.Value = m_GlobalInfo.HIS_DBName
                         sqlpara_dbname.Direction = ParameterDirection.Input
 
                         Dim sqlpara_bakpath As SqlParameter = sqlcmd.Parameters.Add("@BACKUP_FILEPATH", SqlDbType.VarChar, 1000)
-                        sqlpara_dbname.Value = backup_filepath
-                        sqlpara_dbname.Direction = ParameterDirection.Input
+                        sqlpara_bakpath.Value = backup_filepath
+                        sqlpara_bakpath.Direction = ParameterDirection.Input
 
                         Dim sqlpara_mdfpath As SqlParameter = sqlcmd.Parameters.Add("@MDF_FILEPATH", SqlDbType.VarChar, 1000)
-                        sqlpara_dbname.Value = m_GlobalInfo.RestoreMDFPath
-                        sqlpara_dbname.Direction = ParameterDirection.Input
+                        sqlpara_mdfpath.Value = m_GlobalInfo.RestoreMDFPath
+                        sqlpara_mdfpath.Direction = ParameterDirection.Input
 
                         Dim sqlpara_ldfpath As SqlParameter = sqlcmd.Parameters.Add("@LDF_FILEPATH", SqlDbType.VarChar, 1000)
-                        sqlpara_dbname.Value = m_GlobalInfo.RestoreLDFPath
-                        sqlpara_dbname.Direction = ParameterDirection.Input
+                        sqlpara_ldfpath.Value = m_GlobalInfo.RestoreLDFPath
+                        sqlpara_ldfpath.Direction = ParameterDirection.Input
 
                         sqlpara_stpres = sqlcmd.Parameters.Add("@STP_RESULT", SqlDbType.VarChar, 50)
-                        sqlpara_stpres.Value = stp_result
-                        sqlpara_dbname.Direction = ParameterDirection.Output
+                        sqlpara_stpres.Direction = ParameterDirection.Output
 
+                        sqlconn.Open()
                         sqlcmd.ExecuteNonQuery()
+                        stp_result = CType(sqlpara_stpres.Value, String)
 
                         If stp_result <> String.Empty Then
                             Dim err_str As String = ""
 
-                            err_str += "Application Error: Database<" & m_GlobalInfo.PRD_DBName & "> restore failed.(" & stp_result & ")"
+                            err_str += "Application Error: Database<" & m_GlobalInfo.HIS_DBName & "> restore failed.(" & stp_result & ")"
 
                             If m_Logger.IsErrorEnabled Then
                                 m_Logger.Error(err_str)
@@ -904,7 +913,7 @@ Public Class ReportList
                             MsgBox(err_str, MsgBoxStyle.Critical, "System Error")
                         Else
                             info_str = ""
-                            info_str += "Database<" & m_GlobalInfo.PRD_DBName & "> restore successfully."
+                            info_str += "Database<" & m_GlobalInfo.HIS_DBName & "> restore successfully."
                             MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
                         End If
                     End If
@@ -913,7 +922,7 @@ Public Class ReportList
                 Else
                     Dim err_str As String = ""
 
-                    err_str += "Application Error: Database<" & m_GlobalInfo.PRD_DBName & "> restore failed.(" & stp_result & ")"
+                    err_str += "Application Error: Database<" & m_GlobalInfo.HIS_DBName & "> restore failed.(" & stp_result & ")"
 
                     If m_Logger.IsErrorEnabled Then
                         m_Logger.Error(err_str)
