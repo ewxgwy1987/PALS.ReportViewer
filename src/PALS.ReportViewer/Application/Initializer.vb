@@ -69,6 +69,10 @@ Namespace Application
         Private Const XML_NODE_STP_REMOVEBACKUPDATABASE As String = "stp_BHS_RemoveBackupDatabase"
         Private Const XML_NODE_STP_RESTOREDATABASE As String = "stp_BHS_RestoreDatabase"
 
+        Private Const XML_NODE_SSRS_GETDATASOURCEBYUSER As String = "GetDataSourceByUser"
+        Private Const XML_NODE_SSRS_DATASOURCE_PRD As String = "DataSource_PRD"
+        Private Const XML_NODE_SSRS_DATASOURCE_HIS As String = "DataSource_HIS"
+
         'The name of current class 
         Private Shared ReadOnly m_ClassName As String = _
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.ToString
@@ -304,6 +308,16 @@ Namespace Application
                 m_GlobalInfo.SSRS_GetReportsByUser = Temp
             End If
 
+            'Set SSRS store procedure to get Data Source list by username
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_GETDATASOURCEBYUSER
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_GetDataSourceByUser = Temp
+            End If
+
             'Set SSRS production folder
             Temp = Nothing
             crr_xmlnode = XML_NODE_SSRS_PRODUCTIONFOLDER
@@ -322,6 +336,26 @@ Namespace Application
                 LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
             Else
                 m_GlobalInfo.SSRS_HistoricalFolder = Temp
+            End If
+
+            'Set SSRS Data Source for production report
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_DATASOURCE_PRD
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_DataSource_PRD = Temp
+            End If
+
+            'Set SSRS Data Source for historical report
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_DATASOURCE_HIS
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_DataSource_HIS = Temp
             End If
 
             'Set production DB connection string

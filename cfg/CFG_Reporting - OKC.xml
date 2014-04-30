@@ -19,7 +19,7 @@
 			</layout>
 		</appender>
 		<!-- Setup the root category, add the appenders and set the default level -->
-    		<root>
+    	<root>
 			<!-- Level value can be ALL, DEBUG, INFO, WARN, ERROR, FATAL, OFF -->
 			<level value="ALL" />
 			<appender-ref ref="RollingLogFileAppender" />
@@ -27,17 +27,20 @@
 	</log4net>
 
   <configSet name="Database">
-    <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer1;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=30</SSRSDBConnStr>
+    <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer1;Data Source=10.71.200.29;Packet Size=4096; Connection Timeout=30</SSRSDBConnStr>
     <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
+    <GetDataSourceByUser>stp_BHS_MIS_GetDataSourceByUser</GetDataSourceByUser>
     <SSRSPrdFolder>BHSReports</SSRSPrdFolder>
     <SSRSHisFolder>BHSReports HIS</SSRSHisFolder>
+    <DataSource_PrdFolder>/Data Sources/PGLBHSDB_NEW</DataSource_PrdFolder>
+    <DataSource_HisFolder>/Data Sources HIS/PGLBHSDB_NEW</DataSource_HisFolder>
 
-    <PrdDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=30</PrdDBConnStr>
-    <HisDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_HIS;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=30</HisDBConnStr>
+    <PrdDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB;Data Source=10.71.200.29;Packet Size=4096; Connection Timeout=30</PrdDBConnStr>
+    <HisDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_HIS;Data Source=10.71.200.29;Packet Size=4096; Connection Timeout=30</HisDBConnStr>
 
-    <BackupPath>D:\MS SQLSERVER\Backup</BackupPath>
-    <RestoreMDFPath>D:\MS SQLSERVER\DATA\MDF\BHSDB_CLT_HIS.mdf</RestoreMDFPath>
-    <RestoreLDFPath>D:\MS SQLSERVER\DATA\LDF\BHSDB_CLT_HIS_0.ldf</RestoreLDFPath>
+    <BackupPath>I:\MSSQL11.MSSQLSERVER\MSSQL\Backup</BackupPath>
+    <RestoreMDFPath>I:\MSSQL11.MSSQLSERVER\MSSQL\DATA\BHSDB_CLT_HIS.mdf</RestoreMDFPath>
+    <RestoreLDFPath>H:\MSSQL11.MSSQLSERVER\MSSQL\Data\BHSDB_CLT_HIS_log.ldf</RestoreLDFPath>
     <stp_BHS_BackupDatabase>stp_BHS_BackupDatabase</stp_BHS_BackupDatabase>
     <stp_BHS_RemoveBackupDatabase>stp_BHS_RemoveBackupDatabase</stp_BHS_RemoveBackupDatabase>
     <stp_BHS_RestoreDatabase>stp_BHS_RestoreDatabase</stp_BHS_RestoreDatabase>
@@ -50,7 +53,7 @@
     don't have reportServerUrl node, this global report server URL will be used. 
     -->
 	<!--<reportServerUrl>http://localhost/ReportServer</reportServerUrl>-->
-    <reportServerUrl>http://10.71,200.29/ReportServer</reportServerUrl>
+    <reportServerUrl>http://10.71.200.29/ReportServer</reportServerUrl>
     <!--
     User identity of log onto reporting server. If userName is empty, then Windows authentication 
     of current logged in user on client computer will be used for logging onto reporting server. Otherwise,
@@ -189,7 +192,7 @@
         </params>
       </report>
 	  
-	   <report enabled="True" type="Production" name="Flight Summary">
+	  <report enabled="True" type="Production" name="Flight Summary">
         <!--<authentication>True</authentication>-->
         <reportPath>/BHSReports/05 FlightSummaryReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
@@ -365,7 +368,7 @@
         </params>
       </report>
 	  
-	  <report enabled="True" type="Production" name="Critical Tracking Report>
+	  <report enabled="True" type="Production" name="Critical Tracking Report">
         <!--<authentication>True</authentication>-->
         <reportPath>/BHSReports/20 CriticalTrackingPECReport</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>
@@ -413,7 +416,7 @@
         </params>
       </report>
 	  
-	   <report enabled="True" type="Production" name="CBRA Statistics Report">
+	  <report enabled="True" type="Production" name="CBRA Statistics Report">
         <!--<authentication>True</authentication>-->
         <reportPath>/BHSReports/25 CBRAStatistics</reportPath>
         <needDateTimeFormat>True</needDateTimeFormat>

@@ -29,9 +29,12 @@
   <configSet name="Database">
     <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer1;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</SSRSDBConnStr>
     <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
+    <GetDataSourceByUser>stp_BHS_MIS_GetDataSourceByUser</GetDataSourceByUser>
     <SSRSPrdFolder>BHSReports</SSRSPrdFolder>
     <SSRSHisFolder>BHSReports HIS</SSRSHisFolder>
-
+    <DataSource_PRD>/Data Sources/PGLBHSDB_NEW</DataSource_PRD>
+    <DataSource_HIS>/Data Sources HIS/PGLBHSDB_NEW</DataSource_HIS>
+    
     <PrdDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</PrdDBConnStr>
     <HisDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=BHSDB_CLT_HIS;Data Source=SG10031CSD6782;Packet Size=4096; Connection Timeout=80</HisDBConnStr>
 

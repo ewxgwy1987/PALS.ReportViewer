@@ -37,6 +37,7 @@ Public Class ReportList
 
     'Added by Guo Wenyu 2014/04/08
     Private m_ReportsByUser As Hashtable
+    Private m_HT_DataSources As Hashtable
 
     ''' -----------------------------------------------------------------------------
     ''' <summary>
@@ -125,6 +126,21 @@ Public Class ReportList
             'Add by Guo Wenyu 2014/04/08
             'Access report server to get all report names and paths
             m_ReportsByUser = GetReportsByCurrentUser()
+
+            'Check whether current user has authrority to backup or restore database
+            m_HT_DataSources = GetDataSourceByCurrentUser()
+
+            If m_HT_DataSources.Contains(m_GlobalInfo.SSRS_DataSource_PRD) Then
+                Me.btnBackup.Visible = True
+            Else
+                Me.btnBackup.Visible = False
+            End If
+
+            If m_HT_DataSources.Contains(m_GlobalInfo.SSRS_DataSource_HIS) Then
+                Me.btnRestore.Visible = True
+            Else
+                Me.btnRestore.Visible = False
+            End If
 
             Select Case m_GlobalInfo.ReportListStyle
                 Case GUIStype.ListBox
@@ -258,6 +274,87 @@ Public Class ReportList
         Return reports
 
     End Function
+
+    'This function is used to get all data source belonging current user
+    Private Function GetDataSourceTable(ByVal username As String) As DataTable
+
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Dim dt_datasource As DataTable = Nothing
+        Dim ds_datasource As New DataSet
+        Dim sqlconn As SqlConnection = Nothing
+        Dim sqlcmd As SqlCommand = Nothing
+        Try
+            sqlconn = New SqlConnection
+            sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString
+            sqlcmd = New SqlCommand(m_GlobalInfo.SSRS_GetDataSourceByUser, sqlconn)
+            sqlcmd.CommandType = CommandType.StoredProcedure
+
+            Dim sqlpara As SqlParameter = sqlcmd.Parameters.Add("@UserName", SqlDbType.VarChar, 100)
+            sqlpara.Value = username
+
+            Dim sqladapter As New SqlDataAdapter(sqlcmd)
+
+            sqlconn.Open()
+            sqladapter.Fill(ds_datasource)
+            dt_datasource = ds_datasource.Tables(0)
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+
+        Return dt_datasource
+
+    End Function
+
+    'This function is used to get all reports info from report server database by current logged username
+    Private Function GetDataSourceByCurrentUser() As Hashtable
+
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+        Dim ht_dsList As New Hashtable
+
+        Try
+            Dim dt_datasource_list As DataTable
+            Dim username As String = System.Environment.UserName
+            Dim domain As String = System.Environment.UserDomainName
+
+            dt_datasource_list = GetDataSourceTable(username)
+
+            If Not dt_datasource_list.Rows.Count > 0 Then
+                dt_datasource_list = GetDataSourceTable(domain + "\" + username)
+            End If
+
+            'Dim i As Integer
+            Dim dr As DataRow = Nothing
+            Dim name, path As String
+            If dt_datasource_list.Rows.Count > 0 Then
+                For Each dr In dt_datasource_list.Rows
+                    name = CType(dr("Name"), String)
+                    path = CType(dr("Path"), String)
+
+                    If Not ht_dsList.Contains(path) Then
+                        ht_dsList.Add(path, name)
+                    End If
+
+                Next
+            End If
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+
+        Return ht_dsList
+
+    End Function
+
     'Function IsSSRSReport() is used to check the path of the report and its subreports(different types) exists or not in SSRS 
     Private Function IsSSRSReport(ByRef RptID As ReportIdentity) As Boolean
         Dim key As String = RptID.Gourp & " " & RptID.Name
@@ -770,6 +867,8 @@ Public Class ReportList
         Dim stp_result As String = ""
 
         Try
+            Me.btnBackup.Enabled = False
+
             sqlconn = New SqlConnection
             sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
             sqlcmd = New SqlCommand(m_GlobalInfo.STP_BackupDatabase, sqlconn)
@@ -812,6 +911,8 @@ Public Class ReportList
                         " | Message : " & ex.Message)
             End If
             MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        Finally
+            Me.btnBackup.Enabled = True
         End Try
 
 
@@ -827,6 +928,7 @@ Public Class ReportList
         Dim prompt_str As String
 
         Try
+            Me.btnRestore.Enabled = False
 
             prompt_str = "Before Restoring database, you must remove database<" & m_GlobalInfo.HIS_DBName & "> at first. Do you want to continue?"
             Dim msgres As Integer
@@ -940,6 +1042,8 @@ Public Class ReportList
                         " | Message : " & ex.Message)
             End If
             MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        Finally
+            Me.btnRestore.Enabled = True
         End Try
     End Sub
 

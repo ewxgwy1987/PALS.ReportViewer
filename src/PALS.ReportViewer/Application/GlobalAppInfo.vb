@@ -49,8 +49,11 @@ Namespace Application
         'Added by Guo Wenyu 2014/04/08
         Private m_SSRS_DBconnstring As String
         Private m_SSRS_stp_GetReportsByUser As String
+        Private m_SSRS_stp_GetDataSourceByUser As String
         Private m_SSRS_ProductionFolder As String
         Private m_SSRS_HistoricalFolder As String
+        Private m_SSRS_DataSource_PRD As String
+        Private m_SSRS_DataSource_HIS As String
         Private m_Prd_DBconnstring As String
         Private m_Prd_DBName As String
         Private m_His_DBconnstring As String
@@ -282,6 +285,15 @@ Namespace Application
             End Set
         End Property
 
+        Public Property SSRS_GetDataSourceByUser() As String
+            Get
+                Return m_SSRS_stp_GetDataSourceByUser
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_stp_GetDataSourceByUser = Value
+            End Set
+        End Property
+
         Public Property SSRS_ProductionFolder() As String
             Get
                 Return m_SSRS_ProductionFolder
@@ -297,6 +309,24 @@ Namespace Application
             End Get
             Set(ByVal Value As String)
                 m_SSRS_HistoricalFolder = Value
+            End Set
+        End Property
+
+        Public Property SSRS_DataSource_PRD() As String
+            Get
+                Return m_SSRS_DataSource_PRD
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_DataSource_PRD = Value
+            End Set
+        End Property
+
+        Public Property SSRS_DataSource_HIS() As String
+            Get
+                Return m_SSRS_DataSource_HIS
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_DataSource_HIS = Value
             End Set
         End Property
 
