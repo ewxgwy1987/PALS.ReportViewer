@@ -28,6 +28,7 @@
 
   <configSet name="Database">
     <SSRSDBConnStr>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer1;Data Source=10.71.200.29;Packet Size=4096; Connection Timeout=30</SSRSDBConnStr>
+    <SSRSDBConnStr_Secondary>Persist Security Info=False;User ID=sa;Pwd=DBAdm1n@BHS.irel;Initial Catalog=ReportServer;Data Source=10.71.200.29;Packet Size=4096; Connection Timeout=30</SSRSDBConnStr_Secondary>
     <GetReportsByUser>stp_BHS_MIS_GetReportsByUser</GetReportsByUser>
     <GetDataSourceByUser>stp_BHS_MIS_GetDataSourceByUser</GetDataSourceByUser>
     <SSRSPrdFolder>BHSReports</SSRSPrdFolder>
@@ -44,7 +45,8 @@
     <stp_BHS_BackupDatabase>stp_BHS_BackupDatabase</stp_BHS_BackupDatabase>
     <stp_BHS_RemoveBackupDatabase>stp_BHS_RemoveBackupDatabase</stp_BHS_RemoveBackupDatabase>
     <stp_BHS_RestoreDatabase>stp_BHS_RestoreDatabase</stp_BHS_RestoreDatabase>
-  </configSet>
+  
+</configSet>
 
   <configSet name="Reporting">
     <!--

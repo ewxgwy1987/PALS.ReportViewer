@@ -14,6 +14,8 @@ Imports PALS.Utilities
 
 Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Threading
+Imports System.Drawing.Imaging
 
 
 Public Class ReportList
@@ -38,6 +40,11 @@ Public Class ReportList
     'Added by Guo Wenyu 2014/04/08
     Private m_ReportsByUser As Hashtable
     Private m_HT_DataSources As Hashtable
+    ' pnlProcessingBlocker panel transparency by Guo Wenyu -- 2014/05/02
+    Private pnlPB_OPACITY As Single = 0.5F 'transparenty
+    Private Delegate Sub delegate_ShowBlockPanel(ByRef container As Control, ByVal prompt_str As String)
+    Private Delegate Sub delegate_HideBlockPanel(ByRef container As Control)
+    Private Delegate Function delegate_GetBackupFile() As String
 
     ''' -----------------------------------------------------------------------------
     ''' <summary>
@@ -194,6 +201,15 @@ Public Class ReportList
         Try
             sqlconn = New SqlConnection
             sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString
+
+            Try
+                sqlconn.Open()
+            Catch exp As Exception
+                'If the primary connection string cannot be connected, use secondary connection string
+                sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString_Secondary
+                sqlconn.Open()
+            End Try
+
             sqlcmd = New SqlCommand(m_GlobalInfo.SSRS_GetReportsByUser, sqlconn)
             sqlcmd.CommandType = CommandType.StoredProcedure
 
@@ -205,7 +221,6 @@ Public Class ReportList
 
             Dim sqladapter As New SqlDataAdapter(sqlcmd)
 
-            sqlconn.Open()
             sqladapter.Fill(ds_reports)
             dt_reports = ds_reports.Tables(0)
         Catch ex As Exception
@@ -287,6 +302,15 @@ Public Class ReportList
         Try
             sqlconn = New SqlConnection
             sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString
+            Try
+                sqlconn.Open()
+            Catch exp As Exception
+                'If the primary connection string cannot be connected, use secondary connection string
+                sqlconn.ConnectionString = m_GlobalInfo.SSRS_DBConnString_Secondary
+                sqlconn.Open()
+            End Try
+
+
             sqlcmd = New SqlCommand(m_GlobalInfo.SSRS_GetDataSourceByUser, sqlconn)
             sqlcmd.CommandType = CommandType.StoredProcedure
 
@@ -295,7 +319,7 @@ Public Class ReportList
 
             Dim sqladapter As New SqlDataAdapter(sqlcmd)
 
-            sqlconn.Open()
+
             sqladapter.Fill(ds_datasource)
             dt_datasource = ds_datasource.Tables(0)
         Catch ex As Exception
@@ -307,7 +331,7 @@ Public Class ReportList
             MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
         End Try
 
-        Return dt_datasource
+            Return dt_datasource
 
     End Function
 
@@ -858,7 +882,81 @@ Public Class ReportList
         MsgBox("PALS Report Viewer" & vbCrLf & vbCrLf & "Assembly: " & vbTab & assembly & vbCrLf & "Version#: " & vbTab & version, MsgBoxStyle.Information, "Application Info")
     End Sub
 
-    Private Sub btnBackup_Click(sender As System.Object, e As System.EventArgs) Handles btnBackup.Click
+#Region "Backup or Restore Database in threads - Guo Wenyu 2014/05/02"
+
+#Region "pnlProcessingBlocker_Show and pnlProcessingBlocker_Hide"
+
+    Private Function SetImgOpacity(imgPic As Image, imgOpac As Single) As Image
+        Dim bmpPic As Bitmap = New Bitmap(imgPic.Width, imgPic.Height)
+        Dim gfxPic As Graphics = Graphics.FromImage(bmpPic)
+        Dim cmxPic As ColorMatrix = New ColorMatrix()
+        cmxPic.Matrix33 = imgOpac
+        cmxPic.Matrix40 = 0.3F
+        cmxPic.Matrix41 = 0.3F
+        cmxPic.Matrix42 = 0.3F
+        Dim iaPic As ImageAttributes = New ImageAttributes()
+        iaPic.SetColorMatrix(cmxPic, ColorMatrixFlag.Default, ColorAdjustType.Bitmap)
+        gfxPic.DrawImage(imgPic, New Rectangle(0, 0, bmpPic.Width, bmpPic.Height), 0, 0, imgPic.Width, imgPic.Height, GraphicsUnit.Pixel, iaPic)
+        gfxPic.Dispose()
+        Return bmpPic
+    End Function
+
+    'Use a semitransparent panel to block current UI
+    Private Sub pnlProcessingBlocker_Show(ByRef container As Control, ByVal prompt_str As String)
+        ' 1. Get the location and size of groupBox2 which is the container of the 
+        ' pnlProcessingBlocker(Panel), and reset the pnlProcessingBlocker with the same size.
+        container.Controls.Add(Me.pnlProcessingBlocker)
+        Me.pnlProcessingBlocker.BringToFront()
+
+        Dim gb2_width As Integer = container.Width
+        Dim gb2_height As Integer = container.Height
+        Dim gb2_location As Point = container.Location
+
+        Me.pnlProcessingBlocker.Width = gb2_width
+        Me.pnlProcessingBlocker.Height = gb2_height
+        Me.pnlProcessingBlocker.Location = New Point(0, 0)
+        'me.pnlProcessingBlocker.Dock = DockStyle.Top;
+
+        ' 2. Capture the screen shot of groupBox2 into a bitmap, and then modify the transparency
+        ' of the captured image before set to be the background image of pnlProcessingBlocker
+        Dim captured_pnl_bmp As Bitmap = New Bitmap(gb2_width, gb2_height)
+        container.DrawToBitmap(captured_pnl_bmp, New Rectangle(0, 0, gb2_width, gb2_height))
+        'container.DrawToBitmap(captured_pnl_bmp, new Rectangle(container.Location,container.Size))
+        Me.pnlProcessingBlocker.BackgroundImage = SetImgOpacity(captured_pnl_bmp, pnlPB_OPACITY)
+        Me.pnlProcessingBlocker.BackColor = Color.Transparent
+        'me.pnlProcessingBlocker.BackColor = Color.FromArgb(55, 104, 212, 130)
+
+        ' 3. Add a ProgressBar into pnlProcessingBlocker to show progress        
+        pgsbar_Search.Width = 200
+        Dim pgsbar_w As Integer = pgsbar_Search.Width
+        Dim pgsbar_h As Integer = pgsbar_Search.Height
+        pgsbar_Search.Location = New Point(CInt(gb2_width / 2 - pgsbar_w / 2), CInt(gb2_height / 2 - pgsbar_h / 2))
+        Me.pgsbar_Search.Style = ProgressBarStyle.Marquee
+
+        '4. Prompt 
+        Me.lbLoadingPrompt.Text = prompt_str
+        Me.lbLoadingPrompt.MaximumSize = New Size(gb2_width - 8, gb2_height - 4)
+        Dim lbw As Integer = Me.lbLoadingPrompt.Width
+        Dim lbh As Integer = Me.lbLoadingPrompt.Height
+        Me.lbLoadingPrompt.Location = New Point(CInt(gb2_width / 2 - lbw / 2), CInt(gb2_height / 2 + pgsbar_h / 2 + 5))
+        'me.lbLoadingPrompt.BringToFront()
+
+        'pgsbar_Search.PerformStep()
+        Me.pnlProcessingBlocker.Visible = True
+        Me.pnlProcessingBlocker.Refresh()
+        '-----------------END Modified by Guo Wenyu -- 2014/03/12 END----------------
+    End Sub
+
+    Private Sub pnlProcessingBlocker_Hide(ByRef container As Control)
+
+        container.Controls.Remove(Me.pnlProcessingBlocker)
+        Me.pnlProcessingBlocker.Visible = False
+
+        'container.Refresh();
+    End Sub
+#End Region
+
+    Private Sub BackupDB()
         Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
 
         Dim sqlconn As SqlConnection = Nothing
@@ -867,8 +965,6 @@ Public Class ReportList
         Dim stp_result As String = ""
 
         Try
-            Me.btnBackup.Enabled = False
-
             sqlconn = New SqlConnection
             sqlconn.ConnectionString = m_GlobalInfo.PRD_DBconnstring
             sqlcmd = New SqlCommand(m_GlobalInfo.STP_BackupDatabase, sqlconn)
@@ -911,14 +1007,55 @@ Public Class ReportList
                         " | Message : " & ex.Message)
             End If
             MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
-        Finally
-            Me.btnBackup.Enabled = True
         End Try
-
-
     End Sub
 
-    Private Sub btnRestore_Click(sender As System.Object, e As System.EventArgs) Handles btnRestore.Click
+    Private Sub ThrdFun_BackupDB()
+        Dim prompt_str As String = "Database backup is processing."
+
+        Dim dlgt_ShowPnl As delegate_ShowBlockPanel = AddressOf pnlProcessingBlocker_Show
+        Me.Invoke(dlgt_ShowPnl, Me.MainPanel, prompt_str)
+
+        BackupDB()
+
+        Dim dlgt_HidePnl As delegate_HideBlockPanel = AddressOf pnlProcessingBlocker_Hide
+        Me.Invoke(dlgt_HidePnl, Me.MainPanel)
+    End Sub
+
+    Private Sub btnBackup_Click(sender As System.Object, e As System.EventArgs) Handles btnBackup.Click
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Try
+
+            Dim thrd_backupdb As Thread = New Thread(AddressOf ThrdFun_BackupDB)
+            thrd_backupdb.Start()
+
+        Catch ex As Exception
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        End Try
+    End Sub
+
+    Private Function Dlgt_GetBackupFile() As String
+        'Then pop up window to select the database backup file to restore
+        Dim backup_filepath As String = ""
+        Me.OpenBackupFileDialog.InitialDirectory = m_GlobalInfo.BackupPath
+        Me.OpenBackupFileDialog.FileName = ""
+        Dim openres As DialogResult = Me.OpenBackupFileDialog.ShowDialog()
+
+        If openres = DialogResult.OK Then
+            backup_filepath = Me.OpenBackupFileDialog.FileName
+            Return backup_filepath
+        Else
+            Return String.Empty
+        End If
+    End Function
+
+    Private Sub RestoreDB()
         Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
 
         Dim sqlconn As SqlConnection = Nothing
@@ -928,7 +1065,7 @@ Public Class ReportList
         Dim prompt_str As String
 
         Try
-            Me.btnRestore.Enabled = False
+
 
             prompt_str = "Before Restoring database, you must remove database<" & m_GlobalInfo.HIS_DBName & "> at first. Do you want to continue?"
             Dim msgres As Integer
@@ -963,14 +1100,12 @@ Public Class ReportList
 
                     MsgBox(info_str, MsgBoxStyle.Information, "Application Info")
 
-                    'Then pop up window to select the database backup file to restore
-                    Dim backup_filepath As String = ""
-                    Me.OpenBackupFileDialog.InitialDirectory = m_GlobalInfo.BackupPath
-                    Me.OpenBackupFileDialog.FileName = ""
-                    Dim openres As DialogResult = Me.OpenBackupFileDialog.ShowDialog()
+                    ' Use delegate to return main UI thread to open a diaglog to select backup file
+                    Dim backup_filepath As String
+                    Dim dlgt_GetBakFile As delegate_GetBackupFile = AddressOf Dlgt_GetBackupFile
+                    backup_filepath = CType(Me.Invoke(dlgt_GetBakFile), String)
 
-                    If openres = DialogResult.OK Then
-                        backup_filepath = Me.OpenBackupFileDialog.FileName
+                    If Not backup_filepath = String.Empty Then
 
                         'Restore the selected backup file to restore database
                         stp_result = ""
@@ -1033,7 +1168,39 @@ Public Class ReportList
                 End If
             End If
 
+        Catch ex As Exception
+            MsgBox("enter Exception: " + ex.Message, MsgBoxStyle.Information, "Application Info")
+            If m_Logger.IsErrorEnabled Then
+                m_Logger.Error("System Error! <" & ThisMethod & _
+                        "> has exception: Source = " & ex.Source & " | Type : " & ex.GetType.ToString & _
+                        " | Message : " & ex.Message)
+            End If
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
+        Finally
 
+        End Try
+    End Sub
+
+    Private Sub ThrdFun_RestoreDB()
+        Dim prompt_str As String = "Database restore is processing."
+
+        Dim dlgt_ShowPnl As delegate_ShowBlockPanel = AddressOf pnlProcessingBlocker_Show
+        Me.Invoke(dlgt_ShowPnl, Me.MainPanel, prompt_str)
+
+        RestoreDB()
+
+        Dim dlgt_HidePnl As delegate_HideBlockPanel = AddressOf pnlProcessingBlocker_Hide
+        Me.Invoke(dlgt_HidePnl, Me.MainPanel)
+    End Sub
+
+    Private Sub btnRestore_Click(sender As System.Object, e As System.EventArgs) Handles btnRestore.Click
+
+        Dim ThisMethod As String = m_ClassName & "." & System.Reflection.MethodBase.GetCurrentMethod().Name & "()"
+
+        Try
+
+            Dim thrd_restoredb As Thread = New Thread(AddressOf ThrdFun_RestoreDB)
+            thrd_restoredb.Start()
 
         Catch ex As Exception
             If m_Logger.IsErrorEnabled Then
@@ -1042,10 +1209,14 @@ Public Class ReportList
                         " | Message : " & ex.Message)
             End If
             MsgBox(ex.Message, MsgBoxStyle.Critical, "System Error")
-        Finally
-            Me.btnRestore.Enabled = True
+
         End Try
+
+
     End Sub
+
+#End Region
+
 
     Private Sub rbProduction_CheckedChanged(sender As System.Object, e As System.EventArgs)
 

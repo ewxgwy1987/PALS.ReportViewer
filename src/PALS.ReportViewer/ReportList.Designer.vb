@@ -41,8 +41,14 @@ Partial Class ReportList
         Me.btnBackup = New System.Windows.Forms.Button()
         Me.btnRestore = New System.Windows.Forms.Button()
         Me.OpenBackupFileDialog = New System.Windows.Forms.OpenFileDialog()
+        Me.pgsbar_Search = New System.Windows.Forms.ProgressBar()
+        Me.pnlProcessingBlocker = New System.Windows.Forms.Panel()
+        Me.lbLoadingPrompt = New System.Windows.Forms.Label()
+        Me.MainPanel = New System.Windows.Forms.Panel()
         Me.gbType.SuspendLayout()
         Me.ContextMenuStrip1.SuspendLayout()
+        Me.pnlProcessingBlocker.SuspendLayout()
+        Me.MainPanel.SuspendLayout()
         Me.SuspendLayout()
         '
         'gbType
@@ -56,9 +62,9 @@ Partial Class ReportList
         Me.gbType.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.gbType.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.gbType.ForeColor = System.Drawing.SystemColors.ActiveCaption
-        Me.gbType.Location = New System.Drawing.Point(372, 6)
+        Me.gbType.Location = New System.Drawing.Point(365, 13)
         Me.gbType.Name = "gbType"
-        Me.gbType.Size = New System.Drawing.Size(110, 133)
+        Me.gbType.Size = New System.Drawing.Size(110, 144)
         Me.gbType.TabIndex = 1
         Me.gbType.TabStop = False
         Me.gbType.Text = "Type"
@@ -68,7 +74,7 @@ Partial Class ReportList
         Me.rbType6.AutoSize = True
         Me.rbType6.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType6.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType6.Location = New System.Drawing.Point(10, 107)
+        Me.rbType6.Location = New System.Drawing.Point(10, 116)
         Me.rbType6.Name = "rbType6"
         Me.rbType6.Size = New System.Drawing.Size(55, 17)
         Me.rbType6.TabIndex = 1
@@ -82,7 +88,7 @@ Partial Class ReportList
         Me.rbType5.AutoSize = True
         Me.rbType5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType5.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType5.Location = New System.Drawing.Point(10, 90)
+        Me.rbType5.Location = New System.Drawing.Point(10, 98)
         Me.rbType5.Name = "rbType5"
         Me.rbType5.Size = New System.Drawing.Size(55, 17)
         Me.rbType5.TabIndex = 0
@@ -96,7 +102,7 @@ Partial Class ReportList
         Me.rbType1.AutoSize = True
         Me.rbType1.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType1.Location = New System.Drawing.Point(10, 19)
+        Me.rbType1.Location = New System.Drawing.Point(10, 21)
         Me.rbType1.Name = "rbType1"
         Me.rbType1.Size = New System.Drawing.Size(70, 17)
         Me.rbType1.TabIndex = 0
@@ -110,7 +116,7 @@ Partial Class ReportList
         Me.rbType2.AutoSize = True
         Me.rbType2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType2.Location = New System.Drawing.Point(10, 37)
+        Me.rbType2.Location = New System.Drawing.Point(10, 40)
         Me.rbType2.Name = "rbType2"
         Me.rbType2.Size = New System.Drawing.Size(78, 17)
         Me.rbType2.TabIndex = 0
@@ -124,7 +130,7 @@ Partial Class ReportList
         Me.rbType4.AutoSize = True
         Me.rbType4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType4.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType4.Location = New System.Drawing.Point(10, 72)
+        Me.rbType4.Location = New System.Drawing.Point(10, 78)
         Me.rbType4.Name = "rbType4"
         Me.rbType4.Size = New System.Drawing.Size(55, 17)
         Me.rbType4.TabIndex = 0
@@ -138,7 +144,7 @@ Partial Class ReportList
         Me.rbType3.AutoSize = True
         Me.rbType3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.rbType3.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.rbType3.Location = New System.Drawing.Point(10, 54)
+        Me.rbType3.Location = New System.Drawing.Point(10, 59)
         Me.rbType3.Name = "rbType3"
         Me.rbType3.Size = New System.Drawing.Size(55, 17)
         Me.rbType3.TabIndex = 0
@@ -150,9 +156,9 @@ Partial Class ReportList
         'btnPreview
         '
         Me.btnPreview.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnPreview.Location = New System.Drawing.Point(407, 281)
+        Me.btnPreview.Location = New System.Drawing.Point(400, 310)
         Me.btnPreview.Name = "btnPreview"
-        Me.btnPreview.Size = New System.Drawing.Size(75, 21)
+        Me.btnPreview.Size = New System.Drawing.Size(75, 23)
         Me.btnPreview.TabIndex = 3
         Me.btnPreview.Text = "Preview"
         Me.btnPreview.UseVisualStyleBackColor = True
@@ -161,9 +167,9 @@ Partial Class ReportList
         '
         Me.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnClose.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnClose.Location = New System.Drawing.Point(407, 308)
+        Me.btnClose.Location = New System.Drawing.Point(400, 340)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(75, 21)
+        Me.btnClose.Size = New System.Drawing.Size(75, 23)
         Me.btnClose.TabIndex = 4
         Me.btnClose.Text = "Close"
         Me.btnClose.UseVisualStyleBackColor = True
@@ -172,9 +178,9 @@ Partial Class ReportList
         '
         Me.lbReports.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lbReports.FormattingEnabled = True
-        Me.lbReports.Location = New System.Drawing.Point(10, 11)
+        Me.lbReports.Location = New System.Drawing.Point(3, 18)
         Me.lbReports.Name = "lbReports"
-        Me.lbReports.Size = New System.Drawing.Size(348, 225)
+        Me.lbReports.Size = New System.Drawing.Size(348, 238)
         Me.lbReports.TabIndex = 5
         '
         'tvReports
@@ -183,11 +189,11 @@ Partial Class ReportList
         Me.tvReports.HideSelection = False
         Me.tvReports.ImageIndex = 0
         Me.tvReports.ImageList = Me.ImageList1
-        Me.tvReports.Location = New System.Drawing.Point(10, 11)
+        Me.tvReports.Location = New System.Drawing.Point(3, 18)
         Me.tvReports.Name = "tvReports"
         Me.tvReports.SelectedImageIndex = 2
         Me.tvReports.ShowNodeToolTips = True
-        Me.tvReports.Size = New System.Drawing.Size(348, 328)
+        Me.tvReports.Size = New System.Drawing.Size(348, 355)
         Me.tvReports.TabIndex = 6
         '
         'ImageList1
@@ -203,20 +209,20 @@ Partial Class ReportList
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ApplicationInfoToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(178, 26)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(169, 26)
         '
         'ApplicationInfoToolStripMenuItem
         '
         Me.ApplicationInfoToolStripMenuItem.Name = "ApplicationInfoToolStripMenuItem"
-        Me.ApplicationInfoToolStripMenuItem.Size = New System.Drawing.Size(177, 22)
+        Me.ApplicationInfoToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
         Me.ApplicationInfoToolStripMenuItem.Text = "Application Info..."
         '
         'btnBackup
         '
         Me.btnBackup.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnBackup.Location = New System.Drawing.Point(407, 225)
+        Me.btnBackup.Location = New System.Drawing.Point(400, 250)
         Me.btnBackup.Name = "btnBackup"
-        Me.btnBackup.Size = New System.Drawing.Size(75, 21)
+        Me.btnBackup.Size = New System.Drawing.Size(75, 23)
         Me.btnBackup.TabIndex = 3
         Me.btnBackup.Text = "Backup"
         Me.btnBackup.UseVisualStyleBackColor = True
@@ -224,9 +230,9 @@ Partial Class ReportList
         'btnRestore
         '
         Me.btnRestore.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnRestore.Location = New System.Drawing.Point(407, 253)
+        Me.btnRestore.Location = New System.Drawing.Point(400, 280)
         Me.btnRestore.Name = "btnRestore"
-        Me.btnRestore.Size = New System.Drawing.Size(75, 21)
+        Me.btnRestore.Size = New System.Drawing.Size(75, 23)
         Me.btnRestore.TabIndex = 3
         Me.btnRestore.Text = "Restore"
         Me.btnRestore.UseVisualStyleBackColor = True
@@ -235,21 +241,62 @@ Partial Class ReportList
         '
         Me.OpenBackupFileDialog.FileName = "OpenBackupFileDialog"
         '
+        'pgsbar_Search
+        '
+        Me.pgsbar_Search.Location = New System.Drawing.Point(51, 35)
+        Me.pgsbar_Search.MarqueeAnimationSpeed = 50
+        Me.pgsbar_Search.Minimum = 1
+        Me.pgsbar_Search.Name = "pgsbar_Search"
+        Me.pgsbar_Search.Size = New System.Drawing.Size(100, 23)
+        Me.pgsbar_Search.Step = 1
+        Me.pgsbar_Search.TabIndex = 7
+        Me.pgsbar_Search.Value = 1
+        '
+        'pnlProcessingBlocker
+        '
+        Me.pnlProcessingBlocker.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.pnlProcessingBlocker.Controls.Add(Me.lbLoadingPrompt)
+        Me.pnlProcessingBlocker.Controls.Add(Me.pgsbar_Search)
+        Me.pnlProcessingBlocker.Location = New System.Drawing.Point(116, 150)
+        Me.pnlProcessingBlocker.Name = "pnlProcessingBlocker"
+        Me.pnlProcessingBlocker.Size = New System.Drawing.Size(200, 100)
+        Me.pnlProcessingBlocker.TabIndex = 8
+        Me.pnlProcessingBlocker.Visible = False
+        '
+        'lbLoadingPrompt
+        '
+        Me.lbLoadingPrompt.AutoSize = True
+        Me.lbLoadingPrompt.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lbLoadingPrompt.Location = New System.Drawing.Point(83, 65)
+        Me.lbLoadingPrompt.Name = "lbLoadingPrompt"
+        Me.lbLoadingPrompt.Size = New System.Drawing.Size(59, 13)
+        Me.lbLoadingPrompt.TabIndex = 8
+        Me.lbLoadingPrompt.Text = "Processing"
+        Me.lbLoadingPrompt.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'MainPanel
+        '
+        Me.MainPanel.Controls.Add(Me.tvReports)
+        Me.MainPanel.Controls.Add(Me.btnPreview)
+        Me.MainPanel.Controls.Add(Me.btnRestore)
+        Me.MainPanel.Controls.Add(Me.btnClose)
+        Me.MainPanel.Controls.Add(Me.btnBackup)
+        Me.MainPanel.Controls.Add(Me.lbReports)
+        Me.MainPanel.Controls.Add(Me.gbType)
+        Me.MainPanel.Location = New System.Drawing.Point(0, 0)
+        Me.MainPanel.Name = "MainPanel"
+        Me.MainPanel.Size = New System.Drawing.Size(490, 398)
+        Me.MainPanel.TabIndex = 7
+        '
         'ReportList
         '
         Me.AcceptButton = Me.btnPreview
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnClose
-        Me.ClientSize = New System.Drawing.Size(494, 350)
+        Me.ClientSize = New System.Drawing.Size(489, 397)
         Me.ContextMenuStrip = Me.ContextMenuStrip1
-        Me.Controls.Add(Me.btnRestore)
-        Me.Controls.Add(Me.btnBackup)
-        Me.Controls.Add(Me.tvReports)
-        Me.Controls.Add(Me.gbType)
-        Me.Controls.Add(Me.lbReports)
-        Me.Controls.Add(Me.btnClose)
-        Me.Controls.Add(Me.btnPreview)
+        Me.Controls.Add(Me.MainPanel)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
@@ -259,6 +306,9 @@ Partial Class ReportList
         Me.gbType.ResumeLayout(False)
         Me.gbType.PerformLayout()
         Me.ContextMenuStrip1.ResumeLayout(False)
+        Me.pnlProcessingBlocker.ResumeLayout(False)
+        Me.pnlProcessingBlocker.PerformLayout()
+        Me.MainPanel.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -279,5 +329,9 @@ Partial Class ReportList
     Friend WithEvents btnBackup As System.Windows.Forms.Button
     Friend WithEvents btnRestore As System.Windows.Forms.Button
     Friend WithEvents OpenBackupFileDialog As System.Windows.Forms.OpenFileDialog
+    Friend WithEvents pgsbar_Search As System.Windows.Forms.ProgressBar
+    Friend WithEvents pnlProcessingBlocker As System.Windows.Forms.Panel
+    Friend WithEvents lbLoadingPrompt As System.Windows.Forms.Label
+    Friend WithEvents MainPanel As System.Windows.Forms.Panel
 
 End Class

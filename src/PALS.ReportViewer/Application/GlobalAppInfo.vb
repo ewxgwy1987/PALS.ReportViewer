@@ -48,6 +48,7 @@ Namespace Application
 
         'Added by Guo Wenyu 2014/04/08
         Private m_SSRS_DBconnstring As String
+        Private m_SSRS_DBconnstring_Sec As String
         Private m_SSRS_stp_GetReportsByUser As String
         Private m_SSRS_stp_GetDataSourceByUser As String
         Private m_SSRS_ProductionFolder As String
@@ -273,6 +274,15 @@ Namespace Application
             End Get
             Set(ByVal Value As String)
                 m_SSRS_DBconnstring = Value
+            End Set
+        End Property
+
+        Public Property SSRS_DBConnString_Secondary() As String
+            Get
+                Return m_SSRS_DBconnstring_Sec
+            End Get
+            Set(ByVal Value As String)
+                m_SSRS_DBconnstring_Sec = Value
             End Set
         End Property
 

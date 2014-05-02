@@ -57,6 +57,7 @@ Namespace Application
         'Modified by Guo Wenyu 2014/04/14
         Private Const CONFIGSET_DATABASE As String = "Database"
         Private Const XML_NODE_SSRS_DBCONNSTRING As String = "SSRSDBConnStr"
+        Private Const XML_NODE_SSRS_DBCONNSTRING_SECONDARY As String = "SSRSDBConnStr_Secondary"
         Private Const XML_NODE_SSRS_GETREPORTSBYUSER As String = "GetReportsByUser"
         Private Const XML_NODE_SSRS_PRODUCTIONFOLDER As String = "SSRSPrdFolder"
         Private Const XML_NODE_SSRS_HISTORICALFOLDER As String = "SSRSHisFolder"
@@ -296,6 +297,16 @@ Namespace Application
                 LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
             Else
                 m_GlobalInfo.SSRS_DBConnString = Temp
+            End If
+
+            'Set Secondary SSRS DB Connection String to connect report server database
+            Temp = Nothing
+            crr_xmlnode = XML_NODE_SSRS_DBCONNSTRING_SECONDARY
+            Temp = XMLConfig.GetSettingFromInnerText(ConfigSet, crr_xmlnode, Nothing)
+            If Trim(Temp) = "" Then
+                LogXMLError(crr_xmlnode, ConfigSet.Name, ThisMethod)
+            Else
+                m_GlobalInfo.SSRS_DBConnString_Secondary = Temp
             End If
 
             'Set SSRS store procedure to get reports list by username
