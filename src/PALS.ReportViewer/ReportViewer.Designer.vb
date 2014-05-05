@@ -36,7 +36,7 @@ Partial Class ReportViewer
         Me.rptViewer.Name = "rptViewer"
         Me.rptViewer.ProcessingMode = Microsoft.Reporting.WinForms.ProcessingMode.Remote
         Me.rptViewer.ServerReport.ReportServerUrl = New System.Uri("", System.UriKind.Relative)
-        Me.rptViewer.Size = New System.Drawing.Size(692, 670)
+        Me.rptViewer.Size = New System.Drawing.Size(692, 726)
         Me.rptViewer.TabIndex = 0
         '
         'btnClose
@@ -44,23 +44,25 @@ Partial Class ReportViewer
         Me.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.btnClose.Location = New System.Drawing.Point(684, 2)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(25, 21)
+        Me.btnClose.Size = New System.Drawing.Size(25, 23)
         Me.btnClose.TabIndex = 1
         Me.btnClose.Text = "X"
         Me.btnClose.UseVisualStyleBackColor = True
         '
         'ReportViewer
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnClose
-        Me.ClientSize = New System.Drawing.Size(692, 670)
+        Me.ClientSize = New System.Drawing.Size(692, 726)
         Me.Controls.Add(Me.rptViewer)
         Me.Controls.Add(Me.btnClose)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MinimizeBox = False
         Me.Name = "ReportViewer"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Report Viewer"
+        Me.TopMost = True
         Me.ResumeLayout(False)
 
     End Sub

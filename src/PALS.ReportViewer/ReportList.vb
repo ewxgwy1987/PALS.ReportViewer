@@ -175,7 +175,7 @@ Public Class ReportList
             pos_x = CInt(screen_width / 4 - Me.ClientSize.Width / 2)
             Me.Location = New Point(pos_x, pos_y)
 
-
+            Me.TopLevel = True
 
         Catch ex As Exception
             If m_Logger.IsErrorEnabled Then

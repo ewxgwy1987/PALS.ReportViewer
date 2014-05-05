@@ -301,6 +301,7 @@ Public Class ReportViewer
         pos_y = CInt(screen_heigh / 2 - Me.ClientSize.Height / 2)
         pos_x = CInt(screen_width / 4 - Me.ClientSize.Width / 2)
         Me.Location = New Point(pos_x, pos_y)
+        Me.TopLevel = True
     End Sub
 
     Private Sub btnClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnClose.Click
